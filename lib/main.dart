@@ -17,11 +17,19 @@ import 'package:syrenity_client_flutter/widgets/pages/main/server_bar.dart';
 late SyrenityClient client;
 bool ready = false;
 
-void main() async {
+final String defaultBaseApiUrl = "http://localhost:3000";
+
+Future<void> setupClient({bool login = true}) async {
+  final prefs = await SharedPreferences.getInstance();
+  final storedbaseApiUrl = prefs.getString("base_api_url") ?? defaultBaseApiUrl;
+
   client = SyrenityClient(
-    baseUrl: "http://localhost:3000",
-    websocketUrl: "ws://localhost:3000/ws",
+    baseUrl: storedbaseApiUrl,
+    websocketUrl:
+        "${storedbaseApiUrl.startsWith("https://") ? "wss" : "ws"}://${storedbaseApiUrl.replaceFirst("http://", "").replaceAll("https://", "")}/ws",
   );
+
+  if (login == false) return;
 
   client.events.on(SyEvents.ready, (user) {
     userStore.set(user);
@@ -43,8 +51,10 @@ void main() async {
   client.events.on(SyEvents.createUser, (user) {
     userStore.set(user);
   });
+}
 
-  // await client.login("MzM=.1760283952029.205fb667-4277-421f-9542-a2c4e380e301");
+void main() async {
+  await setupClient();
 
   runApp(
     MultiProvider(
@@ -129,6 +139,7 @@ class _PreMainAppState extends State<PreMainApp> {
   Future<void> _onLogin(String newToken) async {
     final prefs = await SharedPreferences.getInstance();
 
+    await setupClient();
     await prefs.setString("token", newToken);
 
     await client.login(newToken, noWs: true);
@@ -189,17 +200,9 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final List<String> messages = [];
-
   @override
   void initState() {
     super.initState();
-
-    client.ws.messages.listen((data) {
-      setState(() {
-        messages.add(data);
-      });
-    });
   }
 
   @override

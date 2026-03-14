@@ -73,6 +73,18 @@ class SyChannel {
     return channel;
   }
 
+  Future<SyMessage> send(String content) async {
+    return await client.http.post<SyMessage, Map<String, dynamic>>(
+      "/api/channels/$id/messages",
+      {'content': content},
+      (client, value) => SyMessage.build(client, value),
+    );
+  }
+
+  Future<void> startTyping() async {
+    await client.http.post("/api/channels/$id/start-typing", {}, null);
+  }
+
   Future<List<SyMessage>> query([ChannelMessageQueryOptions? options]) async {
     final queryParams = <String, String>{};
 

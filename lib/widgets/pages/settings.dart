@@ -47,6 +47,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     final prefs = await SharedPreferences.getInstance();
 
                     await prefs.remove("token");
+                    setupClient(login: false);
                     reload();
                   }
                 }

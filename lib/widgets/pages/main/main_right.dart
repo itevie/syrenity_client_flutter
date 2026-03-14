@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:syrenity_client_flutter/main.dart';
 import 'package:syrenity_client_flutter/stores/channel_store.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
+import 'package:syrenity_client_flutter/syrenity_client/events.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/channel.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/message.dart';
 import 'package:syrenity_client_flutter/theme.dart';
 import 'package:syrenity_client_flutter/widgets/message.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/message_bar.dart';
+import 'package:syrenity_client_flutter/widgets/pages/main/typing_indicator.dart';
 
 class MainRight extends StatefulWidget {
   const MainRight({super.key});
@@ -20,6 +23,7 @@ class _MainRightState extends State<MainRight> {
   int? _lastChannelId;
   bool _isLoadingMore = false;
   bool _showScrollToBottom = false;
+  late void Function(SyMessage)? callback;
 
   final ScrollController _scrollController = ScrollController();
 
@@ -27,9 +31,7 @@ class _MainRightState extends State<MainRight> {
   void initState() {
     super.initState();
 
-    // Listen to scroll events for infinite loading
     _scrollController.addListener(() {
-      // For reverse: true, pixels increase as user scrolls up (older messages)
       if (_scrollController.position.pixels >=
               _scrollController.position.maxScrollExtent - 50 &&
           !_isLoadingMore) {
@@ -45,6 +47,26 @@ class _MainRightState extends State<MainRight> {
         });
       }
     });
+
+    callback = (message) {
+      if (message.channelId != _lastChannelId) return;
+
+      setState(() {
+        messages.insert(0, message);
+      });
+    };
+
+    client.events.on(SyEvents.dispatchCreateMessage, callback!);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    if (callback != null) {
+      client.events.off(SyEvents.dispatchCreateMessage, callback!);
+      callback = null;
+    }
+    super.dispose();
   }
 
   Future<void> load(int channelId) async {
@@ -122,12 +144,6 @@ class _MainRightState extends State<MainRight> {
   }
 
   @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final currentSettings = context.watch<CurrentSettingsState>();
@@ -152,27 +168,26 @@ class _MainRightState extends State<MainRight> {
       });
     }
 
-    return Stack(
-      children: [
-        Column(
-          children: [
-            // Top bar
-            Container(
-              height: SyrenityTheme.topBarHeight,
-              color: colors.surfaceContainer,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Text("#${channel?.name ?? "Loading..."}"),
+    return Container(
+      color: colors.surface,
+      child: Stack(
+        children: [
+          Column(
+            children: [
+              // Top bar
+              Container(
+                height: SyrenityTheme.topBarHeight,
+                color: colors.surfaceContainer,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text("#${channel?.name ?? "Loading..."}"),
+                  ),
                 ),
               ),
-            ),
 
-            // Messages list
-            Expanded(
-              child: Container(
-                color: colors.surface,
+              Expanded(
                 child:
                     channel == null
                         ? const Center(child: Text("Click a channel!"))
@@ -185,10 +200,12 @@ class _MainRightState extends State<MainRight> {
                               itemCount: messages.length,
                               itemBuilder: (context, index) {
                                 final msg = messages[index];
-                                return MessageWidget(message: msg);
+                                return MessageWidget(
+                                  message: msg,
+                                  newestMessage: messages[0].id,
+                                );
                               },
                             ),
-                            // Always include the button, just hide it
                             Positioned(
                               bottom: 16,
                               right: 16,
@@ -204,17 +221,16 @@ class _MainRightState extends State<MainRight> {
                           ],
                         ),
               ),
-            ),
 
-            const MessageBar(),
-          ],
-        ),
-      ],
+              TypingIndicator(channelId: _lastChannelId),
+              MessageBar(
+                key: ValueKey(currentSettings.channelId),
+                channel: channel,
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
-}
-
-bool test(bool val) {
-  print(val);
-  return true;
 }

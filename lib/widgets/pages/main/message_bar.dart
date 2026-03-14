@@ -3,9 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:syrenity_client_flutter/stores/channel_store.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/channel.dart';
+import 'package:flutter/services.dart';
+
+final Map<int, String> channelDrafts = {};
 
 class MessageBar extends StatefulWidget {
-  const MessageBar({super.key});
+  final SyChannel? channel;
+  const MessageBar({super.key, required this.channel});
 
   @override
   State<StatefulWidget> createState() => _MessageBarState();
@@ -13,6 +17,65 @@ class MessageBar extends StatefulWidget {
 
 class _MessageBarState extends State<MessageBar> {
   final TextEditingController controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+
+  void _sendMessage() {
+    final text = controller.text.trim();
+    if (text.isEmpty || widget.channel == null) return;
+
+    widget.channel?.send(text);
+
+    controller.clear();
+    channelDrafts.remove(widget.channel!.id);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller.addListener(() {
+      if (widget.channel != null) {
+        channelDrafts[widget.channel!.id] = controller.text;
+      }
+    });
+
+    if (widget.channel != null) {
+      _loadDraft();
+    }
+  }
+
+  @override
+  void didUpdateWidget(MessageBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.channel != widget.channel) {
+      if (oldWidget.channel != null) {
+        channelDrafts[oldWidget.channel!.id] = controller.text;
+      }
+
+      if (widget.channel != null) {
+        _loadDraft();
+      }
+    }
+  }
+
+  void _loadDraft() {
+    final draft = channelDrafts[widget.channel!.id];
+    controller.text = draft ?? "";
+    controller.selection = TextSelection.fromPosition(
+      TextPosition(offset: controller.text.length),
+    );
+  }
+
+  @override
+  void dispose() {
+    if (widget.channel != null) {
+      channelDrafts[widget.channel!.id] = controller.text;
+    }
+    controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +87,7 @@ class _MessageBarState extends State<MessageBar> {
         currentSettings.channelId == null
             ? null
             : context.select<ChannelStore, SyChannel?>(
-              (x) =>
-                  currentSettings.channelId == null
-                      ? null
-                      : x[currentSettings.channelId!],
+              (x) => x[currentSettings.channelId!],
             );
 
     return Container(
@@ -44,13 +104,32 @@ class _MessageBarState extends State<MessageBar> {
             IconButton(icon: const Icon(Icons.add), onPressed: () {}),
 
             Expanded(
-              child: TextField(
-                controller: controller,
-                minLines: 1,
-                maxLines: 5,
-                decoration: InputDecoration(
-                  hintText: "Message #${channel?.name ?? "Loading..."}",
-                  border: InputBorder.none,
+              child: Shortcuts(
+                shortcuts: const {
+                  SingleActivator(LogicalKeyboardKey.enter): _SendIntent(),
+                },
+                child: Actions(
+                  actions: {
+                    _SendIntent: CallbackAction<_SendIntent>(
+                      onInvoke: (intent) {
+                        _sendMessage();
+                        return null;
+                      },
+                    ),
+                  },
+                  child: TextField(
+                    focusNode: _focusNode,
+                    controller: controller,
+                    minLines: 1,
+                    maxLines: 5,
+                    onChanged: (_) {
+                      channel?.startTyping();
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Message #${channel?.name ?? "Loading..."}",
+                      border: InputBorder.none,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -69,4 +148,8 @@ class _MessageBarState extends State<MessageBar> {
       ),
     );
   }
+}
+
+class _SendIntent extends Intent {
+  const _SendIntent();
 }

@@ -22,6 +22,8 @@ class HttpClient {
     String url,
     T Function(SyrenityClient client, X)? decode,
   ) async {
+    client.debug("HTTP Get: $url");
+
     final result = await http.get(
       Uri.parse("${client.baseUrl}$url"),
       headers: {'Authorization': "Token ${client.token}"},
@@ -45,6 +47,8 @@ class HttpClient {
     Object? jsonBody, {
     Map<String, String> headers = const {},
   }) async {
+    client.debug("HTTP Raw Post: $url");
+
     return await http.post(
       Uri.parse("${client.baseUrl}$url"),
       headers: headers,
@@ -57,13 +61,15 @@ class HttpClient {
     Object? jsonBody,
     T Function(SyrenityClient client, X)? decode,
   ) async {
+    client.debug("HTTP Post: $url");
+
     final result = await http.post(
       Uri.parse("${client.baseUrl}$url"),
       headers: {
         'Authorization': "Token ${client.token}",
         'Content-Type': "application/json",
       },
-      body: jsonBody,
+      body: jsonEncode(jsonBody),
     );
 
     if (result.statusCode != 200) {

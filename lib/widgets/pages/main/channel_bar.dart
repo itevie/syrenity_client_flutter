@@ -70,7 +70,10 @@ class _ChannelBarState extends State<ChannelBar> {
 
                 return ListTile(
                   contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                  title: Text("#${c.name}"),
+                  title: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [const Icon(Icons.tag), Text(c.name)],
+                  ),
                   tileColor:
                       selected ? colors.primary.withValues(alpha: 0.24) : null,
                   hoverColor: colors.primary.withValues(alpha: 0.08),

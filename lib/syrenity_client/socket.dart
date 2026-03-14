@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:syrenity_client_flutter/syrenity_client/client.dart';
+import 'package:syrenity_client_flutter/syrenity_client/dispatch_messages.dart';
 import 'package:syrenity_client_flutter/syrenity_client/events.dart';
 import 'package:syrenity_client_flutter/syrenity_client/ws_messages.dart';
 
@@ -42,6 +43,31 @@ class SyWebsocketManager {
       case WsMsgHello(user: final user):
         client.user = user;
         client.events.emit(SyEvents.ready, user);
+        break;
+
+      case WsMsgDispatch(
+        guildId: final _,
+        channelId: final _,
+        type: final type,
+        originalPayload: final _,
+        payload: final payload,
+      ):
+        switch (payload) {
+          case DispatchMessageCreate(message: final message):
+            client.events.emit(SyEvents.dispatchCreateMessage, message);
+            break;
+          case DispatchChannelStartTyping(channelId: _, userId: _):
+            client.events.emit(SyEvents.dispatchChannelStartTyping, payload);
+            break;
+
+          // ignore: unreachable_switch_default
+          default:
+            client.events.emit(
+              SyEvents.debug,
+              "Dispatch was ignored due to not being implemented: $type",
+            );
+        }
+
         break;
 
       case WsMsgHeartbeat():

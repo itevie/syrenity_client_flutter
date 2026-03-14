@@ -1,4 +1,5 @@
 import 'package:syrenity_client_flutter/syrenity_client/client.dart';
+import 'package:syrenity_client_flutter/syrenity_client/dispatch_messages.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/channel.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/message.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/server.dart';
@@ -29,8 +30,13 @@ class CreateChannelClass extends SyEvent<SyChannel> {
   const CreateChannelClass() : super("create_channel_class");
 }
 
-class MessageCreateEvent extends SyEvent<SyMessage> {
-  const MessageCreateEvent() : super("messageCreate");
+// Dispatches
+class EvDispatchMessageCreate extends SyEvent<SyMessage> {
+  const EvDispatchMessageCreate() : super("dispatch_message_create");
+}
+
+class EvDispatchChannelStartTyping extends SyEvent<DispatchChannelStartTyping> {
+  const EvDispatchChannelStartTyping() : super("dispatch_channel_start_Typing");
 }
 
 class SyEvents {
@@ -39,6 +45,9 @@ class SyEvents {
   static final createUser = CreateUserClass();
   static final createChannel = CreateChannelClass();
   static final createServer = CreateServerClass();
+
+  static final dispatchCreateMessage = EvDispatchMessageCreate();
+  static final dispatchChannelStartTyping = EvDispatchChannelStartTyping();
 }
 
 class SyEventEmitter {
@@ -51,6 +60,17 @@ class SyEventEmitter {
   void on<T>(SyEvent<T> event, void Function(T data) callback) {
     _listeners.putIfAbsent(event.name, () => []);
     _listeners[event.name]!.add(callback);
+  }
+
+  void off<T>(SyEvent<T> event, void Function(T data) callback) {
+    final listeners = _listeners[event.name];
+    if (listeners == null) return;
+
+    listeners.remove(callback);
+
+    if (listeners.isEmpty) {
+      _listeners.remove(event.name);
+    }
   }
 
   void emit<T>(SyEvent<T> event, T data) {

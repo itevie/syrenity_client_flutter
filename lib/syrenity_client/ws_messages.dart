@@ -1,4 +1,5 @@
 import 'package:syrenity_client_flutter/syrenity_client/client.dart';
+import 'package:syrenity_client_flutter/syrenity_client/dispatch_messages.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/user.dart';
 
 sealed class WsMessage {
@@ -23,9 +24,43 @@ sealed class WsMessage {
       case "Error":
         return WsMsgError(error: json["payload"]["error"] as String);
 
+      case "Dispatch":
+        return WsMsgDispatch(
+          client: client,
+          guildId: json['payload']['guildId'],
+          channelId: json['payload']['channelId'],
+          type: json['payload']['type'],
+          originalPayload: json['payload']['payload'],
+        );
+
       default:
         throw Exception("Unknown message type: ${json["type"]}: $json");
     }
+  }
+}
+
+class WsMsgDispatch extends WsMessage {
+  final SyrenityClient client;
+
+  final int? guildId;
+  final int? channelId;
+  final String type;
+  final Map<String, dynamic> originalPayload;
+  late DispatchMessage payload;
+
+  WsMsgDispatch({
+    required this.client,
+    required this.guildId,
+    required this.channelId,
+    required this.type,
+    required this.originalPayload,
+  }) {
+    payload = DispatchMessage.fromJson(this, client);
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {};
   }
 }
 

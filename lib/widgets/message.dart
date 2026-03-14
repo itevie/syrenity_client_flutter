@@ -5,8 +5,9 @@ import 'package:syrenity_client_flutter/theme.dart';
 
 class MessageWidget extends StatefulWidget {
   final SyMessage message;
+  final int? newestMessage;
 
-  const MessageWidget({super.key, required this.message});
+  const MessageWidget({super.key, required this.message, this.newestMessage});
 
   @override
   State<StatefulWidget> createState() => _MessageWidgetState();
@@ -18,7 +19,12 @@ class _MessageWidgetState extends State<MessageWidget> {
     final message = widget.message;
 
     return Padding(
-      padding: EdgeInsetsDirectional.only(bottom: SyrenityTheme.messageSpacing),
+      padding:
+          widget.newestMessage == message.id
+              ? EdgeInsets.zero
+              : EdgeInsetsDirectional.only(
+                bottom: SyrenityTheme.messageSpacing,
+              ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
