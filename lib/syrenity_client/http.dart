@@ -2,10 +2,14 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:syrenity_client_flutter/syrenity_client/client.dart';
+import 'package:syrenity_client_flutter/syrenity_client/events.dart';
 
 class SyHttpException implements Exception {
   final dynamic base;
-  SyHttpException(this.base);
+  final SyrenityClient client;
+  SyHttpException(this.base, this.client) {
+    client.events.emit(SyEvents.error, this);
+  }
 
   @override
   String toString() {
@@ -30,7 +34,7 @@ class HttpClient {
     );
 
     if (result.statusCode != 200) {
-      throw SyHttpException(result.body);
+      throw SyHttpException(result.body, client);
     }
 
     final dynamic body = jsonDecode(result.body);
@@ -56,6 +60,44 @@ class HttpClient {
     );
   }
 
+  Future<http.Response> rawDelete(
+    String url,
+    Object? jsonBody, {
+    Map<String, String> headers = const {},
+  }) async {
+    client.debug("HTTP Raw Delete: $url");
+
+    final response = await http.delete(
+      Uri.parse("${client.baseUrl}$url"),
+      headers: {'Authorization': "Token ${client.token}", ...headers},
+      body: jsonBody,
+    );
+
+    if (response.statusCode != 200) {
+      throw SyHttpException(response.body, client);
+    }
+
+    return response;
+  }
+
+  Future<http.Response> delete(
+    String url,
+    Object? jsonBody, {
+    Map<String, String> headers = const {},
+  }) async {
+    client.debug("HTTP Delete: $url");
+
+    return await http.delete(
+      Uri.parse("${client.baseUrl}$url"),
+      headers: {
+        'Authorization': "Token ${client.token}",
+        'Content-Type': "application/json",
+        ...headers,
+      },
+      body: jsonBody,
+    );
+  }
+
   Future<T> post<T, X>(
     String url,
     Object? jsonBody,
@@ -73,7 +115,7 @@ class HttpClient {
     );
 
     if (result.statusCode != 200) {
-      throw SyHttpException(result.body);
+      throw SyHttpException(result.body, client);
     }
 
     final dynamic body = jsonDecode(result.body);

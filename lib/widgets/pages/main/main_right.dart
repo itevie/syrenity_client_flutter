@@ -24,7 +24,8 @@ class _MainRightState extends State<MainRight> {
   bool _isLoadingMore = false;
   bool _showScrollToBottom = false;
   bool _initialLoading = true;
-  late void Function(SyMessage)? callback;
+  late void Function(SyMessage)? messageCreateCallback;
+  late void Function(int)? messageDeleteCallback;
 
   final ScrollController _scrollController = ScrollController();
 
@@ -49,7 +50,7 @@ class _MainRightState extends State<MainRight> {
       }
     });
 
-    callback = (message) {
+    messageCreateCallback = (message) {
       if (message.channelId != _lastChannelId) return;
 
       setState(() {
@@ -57,16 +58,31 @@ class _MainRightState extends State<MainRight> {
       });
     };
 
-    client.events.on(SyEvents.dispatchCreateMessage, callback!);
+    client.events.on(SyEvents.dispatchCreateMessage, messageCreateCallback!);
+
+    messageDeleteCallback = (messageId) {
+      setState(() {
+        messages = messages.where((x) => x.id != messageId).toList();
+      });
+    };
+
+    client.events.on(SyEvents.dispatchDeleteMessage, messageDeleteCallback!);
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
-    if (callback != null) {
-      client.events.off(SyEvents.dispatchCreateMessage, callback!);
-      callback = null;
+
+    if (messageCreateCallback != null) {
+      client.events.off(SyEvents.dispatchCreateMessage, messageCreateCallback!);
+      messageCreateCallback = null;
     }
+
+    if (messageDeleteCallback != null) {
+      client.events.off(SyEvents.dispatchDeleteMessage, messageDeleteCallback!);
+      messageDeleteCallback = null;
+    }
+
     super.dispose();
   }
 

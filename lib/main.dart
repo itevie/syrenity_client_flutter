@@ -1,3 +1,4 @@
+import 'package:dawn_ui_flutter/prompts/prompts.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -50,6 +51,11 @@ Future<void> setupClient({bool login = true}) async {
 
   client.events.on(SyEvents.createUser, (user) {
     userStore.set(user);
+  });
+
+  client.events.on(SyEvents.error, (error) {
+    print(error);
+    showError!(error);
   });
 }
 
@@ -193,6 +199,7 @@ class MainApp extends StatelessWidget {
 }
 
 void Function(bool?)? setDrawerVisibility;
+late void Function(Exception)? showError;
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -215,12 +222,17 @@ class _ChatPageState extends State<ChatPage> {
         }
       });
     };
+
+    showError = (error) {
+      showErrorPrompt(context, error.toString());
+    };
     super.initState();
   }
 
   @override
   void dispose() {
     setDrawerVisibility = null;
+    showError = null;
     super.dispose();
   }
 

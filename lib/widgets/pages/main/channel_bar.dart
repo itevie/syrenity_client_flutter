@@ -25,6 +25,7 @@ class _ChannelBarState extends State<ChannelBar> {
 
     setState(() {
       channels = loadedChannels;
+      channels.sort((a, b) => a.position - b.position);
     });
   }
 

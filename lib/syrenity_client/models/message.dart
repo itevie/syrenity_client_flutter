@@ -77,4 +77,8 @@ class SyMessage {
       proxyId: json['proxy_id'] as int?,
     );
   }
+
+  Future<void> delete() async {
+    await client.http.rawDelete('/api/channels/$channelId/messages/$id', null);
+  }
 }

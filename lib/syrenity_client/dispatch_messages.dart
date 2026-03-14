@@ -15,6 +15,11 @@ sealed class DispatchMessage {
           message: SyMessage.build(client, dispatch.originalPayload['message']),
         );
 
+      case "MessageDelete":
+        return DispatchMessageDelete(
+          messageId: dispatch.originalPayload['message_id'],
+        );
+
       case "ChannelStartTyping":
         return DispatchChannelStartTyping(
           channelId: dispatch.originalPayload['channel_id'],
@@ -30,6 +35,12 @@ class DispatchMessageCreate extends DispatchMessage {
   final SyMessage message;
 
   const DispatchMessageCreate({required this.message});
+}
+
+class DispatchMessageDelete extends DispatchMessage {
+  final int messageId;
+
+  const DispatchMessageDelete({required this.messageId});
 }
 
 class DispatchChannelStartTyping extends DispatchMessage {

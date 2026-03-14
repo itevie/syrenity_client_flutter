@@ -18,6 +18,10 @@ class DebugEvent extends SyEvent<String> {
   const DebugEvent() : super("debug");
 }
 
+class ErrorEvent extends SyEvent<Exception> {
+  const ErrorEvent() : super("error");
+}
+
 class CreateUserClass extends SyEvent<SyUser> {
   const CreateUserClass() : super("create_user_class");
 }
@@ -35,6 +39,10 @@ class EvDispatchMessageCreate extends SyEvent<SyMessage> {
   const EvDispatchMessageCreate() : super("dispatch_message_create");
 }
 
+class EvDispatchMessageDelete extends SyEvent<int> {
+  const EvDispatchMessageDelete() : super("dispatch_message_delete");
+}
+
 class EvDispatchChannelStartTyping extends SyEvent<DispatchChannelStartTyping> {
   const EvDispatchChannelStartTyping() : super("dispatch_channel_start_Typing");
 }
@@ -42,11 +50,13 @@ class EvDispatchChannelStartTyping extends SyEvent<DispatchChannelStartTyping> {
 class SyEvents {
   static final ready = ReadyEvent();
   static final debug = DebugEvent();
+  static final error = ErrorEvent();
   static final createUser = CreateUserClass();
   static final createChannel = CreateChannelClass();
   static final createServer = CreateServerClass();
 
   static final dispatchCreateMessage = EvDispatchMessageCreate();
+  static final dispatchDeleteMessage = EvDispatchMessageDelete();
   static final dispatchChannelStartTyping = EvDispatchChannelStartTyping();
 }
 
