@@ -8,10 +8,12 @@ class ContextMenuButton extends ContextMenuItem {
   final String label;
   final IconData? icon;
   final VoidCallback onPressed;
+  final bool danger;
 
   const ContextMenuButton({
     required this.label,
     required this.onPressed,
+    this.danger = false,
     this.icon,
   });
 }
@@ -58,15 +60,26 @@ class _ContextMenuState extends State<ContextMenu> {
   }
 
   PopupMenuEntry buildMenuItem(ContextMenuItem item) {
+    final colors = Theme.of(context).colorScheme;
+
     switch (item) {
-      case ContextMenuButton(:final label, :final icon, :final onPressed):
+      case ContextMenuButton(
+        :final label,
+        :final icon,
+        :final onPressed,
+        :final danger,
+      ):
         return PopupMenuItem(
           onTap: onPressed,
           child: Row(
             children: [
-              if (icon != null) Icon(icon, size: 16),
+              if (icon != null)
+                Icon(icon, size: 16, color: danger ? colors.error : null),
               if (icon != null) const SizedBox(width: 8),
-              Text(label),
+              Text(
+                label,
+                style: danger ? TextStyle(color: colors.error) : null,
+              ),
             ],
           ),
         );

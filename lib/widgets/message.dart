@@ -3,6 +3,7 @@ import 'package:syrenity_client_flutter/main.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/message.dart';
 import 'package:syrenity_client_flutter/theme.dart';
 import 'package:syrenity_client_flutter/widgets/context_menu.dart';
+import 'package:syrenity_client_flutter/widgets/copy_something.dart';
 
 class MessageWidget extends StatefulWidget {
   final SyMessage message;
@@ -21,53 +22,72 @@ class _MessageWidgetState extends State<MessageWidget> {
 
     return ContextMenu(
       items: [
-        ContextMenuSeparator(),
+        ContextMenuButton(
+          onPressed: () async {
+            // await message.delete();
+          },
+          label: "Edit",
+          icon: Icons.edit,
+        ),
         ContextMenuButton(
           onPressed: () async {
             await message.delete();
           },
           label: "Delete",
           icon: Icons.delete,
+          danger: true,
         ),
+        ContextMenuSeparator(),
+
+        makeCopyContextMenuButton(context, "Message ID", message.id.toString()),
       ],
-      child: Padding(
-        padding:
-            widget.newestMessage == message.id
-                ? EdgeInsets.zero
-                : EdgeInsetsDirectional.only(
-                  bottom: SyrenityTheme.messageSpacing,
-                ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              key: Key(message.id.toString()),
-              radius: SyrenityTheme.messageAvatarSize,
-              backgroundImage: NetworkImage(
-                client.fileBase.from(
-                  message.author.avatar ?? client.fileBase.badUrl,
-                )!,
-              ),
-            ),
-
-            const SizedBox(width: 8),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "${message.author.username}: ${message.id}",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            // handle tap if needed
+          },
+          child: Padding(
+            padding:
+                widget.newestMessage == message.id
+                    ? EdgeInsets.zero
+                    : EdgeInsetsDirectional.only(
+                      bottom: SyrenityTheme.messageSpacing / 2,
+                      top: SyrenityTheme.messageSpacing / 2,
+                    ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  key: Key(message.id.toString()),
+                  radius: SyrenityTheme.messageAvatarSize,
+                  backgroundImage: NetworkImage(
+                    client.fileBase.from(
+                      message.author.avatar ?? client.fileBase.badUrl,
+                    )!,
                   ),
-                  const SizedBox(height: 4),
-                  Text(message.content),
-                ],
-              ),
+                ),
+
+                const SizedBox(width: 8),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "${message.author.username}: ${message.id}",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(message.content),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
