@@ -32,6 +32,7 @@ class _ServerBarWidget extends State<ServerBar> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final isDesktop = MediaQuery.of(context).size.width >= 600;
     final currentSettings = context.watch<CurrentSettingsState>();
 
     return Column(
@@ -39,7 +40,20 @@ class _ServerBarWidget extends State<ServerBar> {
         Container(
           height: SyrenityTheme.topBarHeight,
           color: colors.surfaceContainer,
-          child: const Center(child: Text("Sy")),
+          // color: colors.inversePrimary,
+          child: Center(
+            child:
+                isDesktop
+                    ? Text("Sy")
+                    : IconButton(
+                      onPressed: () {
+                        if (setDrawerVisibility != null) {
+                          setDrawerVisibility!(false);
+                        }
+                      },
+                      icon: const Icon(Icons.menu),
+                    ),
+          ),
         ),
         Expanded(
           child: Container(

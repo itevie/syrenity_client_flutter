@@ -54,6 +54,7 @@ class _ChannelBarState extends State<ChannelBar> {
         Container(
           height: SyrenityTheme.topBarHeight,
           color: colors.surfaceContainer,
+          // color: colors.inversePrimary,
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(server?.name ?? "Loading..."),
@@ -78,6 +79,9 @@ class _ChannelBarState extends State<ChannelBar> {
                       selected ? colors.primary.withValues(alpha: 0.24) : null,
                   hoverColor: colors.primary.withValues(alpha: 0.08),
                   onTap: () {
+                    if (setDrawerVisibility != null) {
+                      setDrawerVisibility!(false);
+                    }
                     context.read<CurrentSettingsState>().setChannel(c.id);
                   },
                 );

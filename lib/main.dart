@@ -192,6 +192,8 @@ class MainApp extends StatelessWidget {
   }
 }
 
+void Function(bool?)? setDrawerVisibility;
+
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
 
@@ -200,45 +202,83 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  bool drawerShown = false;
+
   @override
   void initState() {
+    setDrawerVisibility = (value) {
+      setState(() {
+        if (value == null) {
+          drawerShown = !drawerShown;
+        } else {
+          drawerShown = value;
+        }
+      });
+    };
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    setDrawerVisibility = null;
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final isDesktop = MediaQuery.of(context).size.width >= 600;
+    bool showMobileDrawer = !isDesktop && drawerShown;
 
-    return Row(
-      children: [
-        Container(
-          width: SyrenityTheme.serverChannelBarWidth,
-          color: colors.secondaryContainer,
-          child: Column(
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    // Servers
-                    SizedBox(
-                      width: SyrenityTheme.serverBarWidth,
-                      child: ServerBar(),
+    return GestureDetector(
+      // Detect horizontal swipes anywhere on the screen
+      onHorizontalDragUpdate: (details) {
+        if (!isDesktop) {
+          if (details.delta.dx > 10) {
+            // Swipe right → open drawer
+            setState(() => drawerShown = true);
+          } else if (details.delta.dx < -10) {
+            // Swipe left → close drawer
+            setState(() => drawerShown = false);
+          }
+        }
+      },
+      child: Row(
+        children: [
+          // Server/Channel panel
+          Offstage(
+            offstage: !(isDesktop || drawerShown),
+            child: Container(
+              width:
+                  showMobileDrawer
+                      ? MediaQuery.of(context).size.width
+                      : SyrenityTheme.serverChannelBarWidth,
+              color: colors.secondaryContainer,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        // Servers (keeps state alive)
+                        SizedBox(
+                          width: SyrenityTheme.serverBarWidth,
+                          child: ServerBar(),
+                        ),
+                        // Channels (keeps state alive)
+                        Expanded(child: ChannelBar()),
+                      ],
                     ),
-                    SizedBox(
-                      width:
-                          SyrenityTheme.serverChannelBarWidth -
-                          SyrenityTheme.serverBarWidth,
-                      child: ChannelBar(),
-                    ),
-                  ],
-                ),
+                  ),
+                  SelfSection(),
+                ],
               ),
-              SelfSection(),
-            ],
+            ),
           ),
-        ),
-        Expanded(child: MainRight()),
-      ],
+
+          // Main content
+          Expanded(child: MainRight()),
+        ],
+      ),
     );
   }
 }

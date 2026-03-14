@@ -23,6 +23,7 @@ class _MainRightState extends State<MainRight> {
   int? _lastChannelId;
   bool _isLoadingMore = false;
   bool _showScrollToBottom = false;
+  bool _initialLoading = true;
   late void Function(SyMessage)? callback;
 
   final ScrollController _scrollController = ScrollController();
@@ -93,6 +94,10 @@ class _MainRightState extends State<MainRight> {
     } catch (e) {
       setState(() => messages = []);
       rethrow;
+    } finally {
+      setState(() {
+        _initialLoading = false;
+      });
     }
   }
 
@@ -147,6 +152,7 @@ class _MainRightState extends State<MainRight> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final currentSettings = context.watch<CurrentSettingsState>();
+    final isDesktop = MediaQuery.of(context).size.width >= 600;
 
     final channel =
         currentSettings.channelId == null
@@ -178,11 +184,27 @@ class _MainRightState extends State<MainRight> {
               Container(
                 height: SyrenityTheme.topBarHeight,
                 color: colors.surfaceContainer,
+                // color: colors.inversePrimary,
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Text("#${channel?.name ?? "Loading..."}"),
+                    child: Row(
+                      children: [
+                        if (!isDesktop) ...[
+                          IconButton(
+                            onPressed: () {
+                              if (setDrawerVisibility != null) {
+                                setDrawerVisibility!(true);
+                              }
+                            },
+                            icon: const Icon(Icons.menu),
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        Text("#${channel?.name ?? "Loading..."}"),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -193,19 +215,23 @@ class _MainRightState extends State<MainRight> {
                         ? const Center(child: Text("Click a channel!"))
                         : Stack(
                           children: [
-                            ListView.builder(
-                              controller: _scrollController,
-                              reverse: true,
-                              padding: const EdgeInsets.all(10),
-                              itemCount: messages.length,
-                              itemBuilder: (context, index) {
-                                final msg = messages[index];
-                                return MessageWidget(
-                                  message: msg,
-                                  newestMessage: messages[0].id,
-                                );
-                              },
-                            ),
+                            _initialLoading
+                                ? Center(child: CircularProgressIndicator())
+                                : messages.isEmpty
+                                ? const Center(child: Text("So empty..."))
+                                : ListView.builder(
+                                  controller: _scrollController,
+                                  reverse: true,
+                                  padding: const EdgeInsets.all(10),
+                                  itemCount: messages.length,
+                                  itemBuilder: (context, index) {
+                                    final msg = messages[index];
+                                    return MessageWidget(
+                                      message: msg,
+                                      newestMessage: messages[0].id,
+                                    );
+                                  },
+                                ),
                             Positioned(
                               bottom: 16,
                               right: 16,
