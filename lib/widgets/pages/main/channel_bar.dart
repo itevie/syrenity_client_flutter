@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:syrenity_client_flutter/main.dart';
+import 'package:syrenity_client_flutter/app_client.dart';
+import 'package:syrenity_client_flutter/main_callbacks.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/stores/server_store.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/channel.dart';
@@ -80,8 +81,8 @@ class _ChannelBarState extends State<ChannelBar> {
                       selected ? colors.primary.withValues(alpha: 0.24) : null,
                   hoverColor: colors.primary.withValues(alpha: 0.08),
                   onTap: () {
-                    if (setDrawerVisibility != null) {
-                      setDrawerVisibility!(false);
+                    if (MainCallbacks.setDrawerVisibility != null) {
+                      MainCallbacks.setDrawerVisibility!(false);
                     }
                     context.read<CurrentSettingsState>().setChannel(c.id);
                   },

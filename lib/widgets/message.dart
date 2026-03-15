@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:syrenity_client_flutter/main.dart';
+import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/message.dart';
 import 'package:syrenity_client_flutter/theme.dart';
 import 'package:syrenity_client_flutter/widgets/context_menu.dart';
@@ -39,6 +39,7 @@ class _MessageWidgetState extends State<MessageWidget> {
         ),
         ContextMenuSeparator(),
 
+        makeCopyContextMenuButton(context, "Message Content", message.content),
         makeCopyContextMenuButton(context, "Message ID", message.id.toString()),
       ],
       child: Material(

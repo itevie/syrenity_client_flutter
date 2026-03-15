@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:syrenity_client_flutter/main.dart';
+import 'package:syrenity_client_flutter/app_client.dart';
+import 'package:syrenity_client_flutter/main_callbacks.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/server.dart';
 import 'package:syrenity_client_flutter/theme.dart';
@@ -47,8 +48,8 @@ class _ServerBarWidget extends State<ServerBar> {
                     ? Text("Sy")
                     : IconButton(
                       onPressed: () {
-                        if (setDrawerVisibility != null) {
-                          setDrawerVisibility!(false);
+                        if (MainCallbacks.setDrawerVisibility != null) {
+                          MainCallbacks.setDrawerVisibility!(false);
                         }
                       },
                       icon: const Icon(Icons.menu),

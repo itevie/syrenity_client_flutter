@@ -2,7 +2,7 @@ import 'package:dawn_ui_flutter/prompts/prompts.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:syrenity_client_flutter/main.dart';
+import 'package:syrenity_client_flutter/app_client.dart';
 
 class LoginPage extends StatefulWidget {
   final Future<void> Function(String token) onLogin;

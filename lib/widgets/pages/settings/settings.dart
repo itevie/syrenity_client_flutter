@@ -1,7 +1,5 @@
-import 'package:dawn_ui_flutter/prompts/confirm.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:syrenity_client_flutter/main.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/setting_sections.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -12,14 +10,23 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   int selectedSection = 0;
+  List<SettingSection> sections = [];
 
-  final sections = [
-    "Account",
-    "Privacy",
-    "Notifications",
-    "Appearance",
-    "Log Out",
-  ];
+  List<SettingSection> getSections() {
+    return <SettingSection>[
+      SettingSections.chat(context),
+      SettingSections.widget(context),
+      SettingSections.logout(context),
+    ];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      sections = getSections();
+    });
+  }
 
   Widget buildSidebar(bool isDesktop) {
     final colors = Theme.of(context).colorScheme;
@@ -34,22 +41,14 @@ class _SettingsPageState extends State<SettingsPage> {
             final selected = index == selectedSection;
 
             return ListTile(
-              title: Text(sections[index]),
+              title: Text(sections[index].name),
               selected: selected,
               onTap: () async {
-                if (sections[index] == "Log Out") {
-                  final conf = await showConfirmPrompt(
-                    context,
-                    const Text("Logout"),
-                    const Text("Are you sure you want to logout?"),
-                  );
-                  if (conf) {
-                    final prefs = await SharedPreferences.getInstance();
-
-                    await prefs.remove("token");
-                    setupClient(login: false);
-                    reload();
-                  }
+                switch (sections[index]) {
+                  case CallbackSettingSecttion(:final callback):
+                    callback();
+                    return;
+                  default:
                 }
 
                 setState(() {
@@ -58,7 +57,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
                 if (!isDesktop) {
                   // ignore: use_build_context_synchronously
-                  Navigator.pop(context); // close drawer
+                  Navigator.pop(context);
                 }
               },
             );
@@ -69,11 +68,14 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget buildContent() {
+    switch (sections[selectedSection]) {
+      case WidgetSettingsSection(:final widget):
+        return widget();
+      default:
+    }
+
     return Center(
-      child: Text(
-        sections[selectedSection],
-        style: const TextStyle(fontSize: 24),
-      ),
+      child: Text("${sections[selectedSection].name}: Cannot handle"),
     );
   }
 

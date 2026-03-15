@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:syrenity_client_flutter/main.dart';
+import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/stores/user_store.dart';
 import 'package:syrenity_client_flutter/syrenity_client/dispatch_messages.dart';
 import 'package:syrenity_client_flutter/syrenity_client/events.dart';

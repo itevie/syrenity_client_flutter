@@ -1,10 +1,10 @@
 import 'package:dawn_ui_flutter/dawn_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:syrenity_client_flutter/main.dart';
+import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/stores/user_store.dart';
 import 'package:syrenity_client_flutter/theme.dart';
-import 'package:syrenity_client_flutter/widgets/pages/settings.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/settings.dart';
 
 class SelfSection extends StatefulWidget {
   const SelfSection({super.key});
