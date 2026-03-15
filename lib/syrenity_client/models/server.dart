@@ -2,6 +2,7 @@ import 'package:syrenity_client_flutter/syrenity_client/client.dart';
 import 'package:syrenity_client_flutter/syrenity_client/events.dart';
 import 'package:syrenity_client_flutter/syrenity_client/managers/server_channels_manager.dart';
 import 'package:syrenity_client_flutter/syrenity_client/managers/server_invites_manager.dart';
+import 'package:syrenity_client_flutter/syrenity_client/managers/server_membert_manager.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/channel.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/user.dart';
 
@@ -20,6 +21,11 @@ class SyServer {
   );
 
   late final ServerInvitesManager invites = ServerInvitesManager(
+    client: client,
+    server: this,
+  );
+
+  late final ServerMembertManager members = ServerMembertManager(
     client: client,
     server: this,
   );

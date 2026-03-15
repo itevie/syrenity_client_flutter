@@ -22,9 +22,13 @@ class MainRight extends StatefulWidget {
 class _MainRightState extends State<MainRight> {
   List<SyMessage> messages = [];
   int? _lastChannelId;
+
   bool _isLoadingMore = false;
   bool _showScrollToBottom = false;
   bool _initialLoading = true;
+
+  int _loadToken = 0;
+
   late void Function(SyMessage)? messageCreateCallback;
   late void Function(int)? messageDeleteCallback;
 
@@ -87,12 +91,30 @@ class _MainRightState extends State<MainRight> {
     super.dispose();
   }
 
-  Future<void> load(int channelId) async {
+  void _onChannelChanged(int? channelId) {
+    if (channelId == null || channelId == _lastChannelId) return;
+
+    _lastChannelId = channelId;
+    _loadToken++;
+
+    setState(() {
+      messages = [];
+      _initialLoading = true;
+      _isLoadingMore = false;
+      _showScrollToBottom = false;
+    });
+
+    load(channelId, _loadToken);
+  }
+
+  Future<void> load(int channelId, int token) async {
     final channelStore = context.read<ChannelStore>();
     final channel = channelStore[channelId];
 
     if (channel == null) {
-      setState(() => messages = []);
+      if (mounted && token == _loadToken) {
+        setState(() => messages = []);
+      }
       return;
     }
 
@@ -101,18 +123,23 @@ class _MainRightState extends State<MainRight> {
         ChannelMessageQueryOptions(amount: 20),
       );
 
-      setState(() => messages = fetchedMessages);
+      if (!mounted || token != _loadToken) return;
+
+      setState(() {
+        messages = fetchedMessages;
+        _initialLoading = false;
+      });
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_scrollController.hasClients) {
           _scrollController.jumpTo(_scrollController.position.minScrollExtent);
         }
       });
-    } catch (e) {
-      setState(() => messages = []);
-      rethrow;
-    } finally {
+    } catch (_) {
+      if (!mounted || token != _loadToken) return;
+
       setState(() {
+        messages = [];
         _initialLoading = false;
       });
     }
@@ -129,7 +156,9 @@ class _MainRightState extends State<MainRight> {
   }
 
   Future<void> _loadMore() async {
-    if (_lastChannelId == null || messages.isEmpty) return;
+    if (_lastChannelId == null || messages.isEmpty || _isLoadingMore) return;
+
+    final token = _loadToken;
 
     final channelStore = context.read<ChannelStore>();
     final channel = channelStore[_lastChannelId!];
@@ -141,16 +170,18 @@ class _MainRightState extends State<MainRight> {
       final oldestMessageId = messages
           .map((m) => m.id)
           .reduce((a, b) => a < b ? a : b);
+
       final fetched = await channel.query(
         ChannelMessageQueryOptions(amount: 20, startAt: oldestMessageId),
       );
 
+      if (!mounted || token != _loadToken) return;
+
       if (fetched.isNotEmpty) {
-        // Preserve scroll position
         final oldScrollHeight = _scrollController.position.maxScrollExtent;
 
         setState(() {
-          messages = messages + fetched;
+          messages = [...messages, ...fetched];
         });
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -161,35 +192,29 @@ class _MainRightState extends State<MainRight> {
         });
       }
     } finally {
-      setState(() => _isLoadingMore = false);
+      if (mounted && token == _loadToken) {
+        setState(() => _isLoadingMore = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final currentSettings = context.watch<CurrentSettingsState>();
     final isDesktop = MediaQuery.of(context).size.width >= 600;
 
+    final channelId = context.select<CurrentSettingsState, int?>(
+      (s) => s.channelId,
+    );
+
+    _onChannelChanged(channelId);
+
     final channel =
-        currentSettings.channelId == null
+        channelId == null
             ? null
             : context.select<ChannelStore, SyChannel?>(
-              (store) =>
-                  currentSettings.channelId == null
-                      ? null
-                      : store[currentSettings.channelId!],
+              (store) => store[channelId],
             );
-
-    // Load messages when the selected channel changes
-    if (currentSettings.channelId != null &&
-        currentSettings.channelId != _lastChannelId) {
-      _lastChannelId = currentSettings.channelId;
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        load(currentSettings.channelId!);
-      });
-    }
 
     return Container(
       color: colors.surface,
@@ -197,31 +222,33 @@ class _MainRightState extends State<MainRight> {
         children: [
           Column(
             children: [
-              // Top bar
               Container(
                 height: SyrenityTheme.topBarHeight,
                 color: colors.surfaceContainer,
-                // color: colors.inversePrimary,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Row(
-                      children: [
-                        if (!isDesktop) ...[
-                          IconButton(
-                            onPressed: () {
-                              if (MainCallbacks.setDrawerVisibility != null) {
-                                MainCallbacks.setDrawerVisibility!(true);
-                              }
-                            },
-                            icon: const Icon(Icons.menu),
-                          ),
-                          const SizedBox(width: 8),
-                        ],
-                        Text("#${channel?.name ?? "Loading..."}"),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Row(
+                    children: [
+                      if (!isDesktop) ...[
+                        IconButton(
+                          onPressed: () {
+                            MainCallbacks.setDrawerVisibility?.call(true);
+                          },
+                          icon: const Icon(Icons.menu),
+                        ),
+                        const SizedBox(width: 8),
                       ],
-                    ),
+                      Text("#${channel?.name ?? "Loading..."}"),
+                      Spacer(),
+                      IconButton(
+                        icon: Icon(Icons.group),
+                        onPressed: () {
+                          if (MainCallbacks.setMemberBarVisibility != null) {
+                            MainCallbacks.setMemberBarVisibility!(null);
+                          }
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -233,7 +260,9 @@ class _MainRightState extends State<MainRight> {
                         : Stack(
                           children: [
                             _initialLoading
-                                ? Center(child: CircularProgressIndicator())
+                                ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
                                 : messages.isEmpty
                                 ? const Center(child: Text("So empty..."))
                                 : ListView.builder(
@@ -266,10 +295,7 @@ class _MainRightState extends State<MainRight> {
               ),
 
               TypingIndicator(channelId: _lastChannelId),
-              MessageBar(
-                key: ValueKey(currentSettings.channelId),
-                channel: channel,
-              ),
+              MessageBar(key: ValueKey(channelId), channel: channel),
             ],
           ),
         ],

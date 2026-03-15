@@ -23,6 +23,8 @@ class _ServerBarWidget extends State<ServerBar> {
   }
 
   void reload() async {
+    if (client.scaryUser == null) return;
+
     final loadedServers = await client.servers.fetchAll();
 
     setState(() {

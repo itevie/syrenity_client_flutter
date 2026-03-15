@@ -1,7 +1,21 @@
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/setting_parts.dart';
 
 class SettingsStorage {
   SettingsStorage._privateConstructor();
+
+  final Map<String, ValueNotifier<dynamic>> _notifiers = {};
+
+  ValueNotifier<T> notifierFor<T>(SettingKeys key) {
+    if (_prefs == null) throw Exception("SettingsStorage not initialized");
+
+    return _notifiers.putIfAbsent(
+          key.storageKey,
+          () => ValueNotifier<T>(getSetting<T>(key)),
+        )
+        as ValueNotifier<T>;
+  }
 
   static final SettingsStorage _instance =
       SettingsStorage._privateConstructor();
@@ -22,17 +36,36 @@ class SettingsStorage {
   Future<bool> set<T>(String key, T value) async {
     if (_prefs == null) throw Exception("SettingsStorage not initialized");
 
-    if (value is bool) return _prefs!.setBool(key, value);
-    if (value is int) return _prefs!.setInt(key, value);
-    if (value is double) return _prefs!.setDouble(key, value);
-    if (value is String) return _prefs!.setString(key, value);
-    if (value is List<String>) return _prefs!.setStringList(key, value);
+    bool result;
 
-    throw Exception("Unsupported type: ${value.runtimeType}");
+    if (value is bool) {
+      result = await _prefs!.setBool(key, value);
+    } else if (value is int) {
+      result = await _prefs!.setInt(key, value);
+    } else if (value is double) {
+      result = await _prefs!.setDouble(key, value);
+    } else if (value is String) {
+      result = await _prefs!.setString(key, value);
+    } else if (value is List<String>) {
+      result = await _prefs!.setStringList(key, value);
+    } else {
+      throw Exception("Unsupported type: ${value.runtimeType}");
+    }
+
+    if (_notifiers.containsKey(key)) {
+      _notifiers[key]!.value = value;
+    }
+
+    return result;
   }
 
   Future<bool> remove(String key) async {
     if (_prefs == null) throw Exception("SettingsStorage not initialized");
     return _prefs!.remove(key);
+  }
+
+  T getSetting<T>(SettingKeys key) {
+    if (_prefs == null) throw Exception("SettingsStorage not initialized");
+    return _prefs!.get(key.storageKey) as T? ?? key.defaultValue as T;
   }
 }

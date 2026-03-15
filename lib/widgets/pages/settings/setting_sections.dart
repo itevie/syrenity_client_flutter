@@ -2,7 +2,9 @@ import 'package:dawn_ui_flutter/prompts/confirm.dart';
 import 'package:flutter/material.dart';
 import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/shared_prefs.dart';
+import 'package:syrenity_client_flutter/widgets/modals/user_viewer.dart';
 import 'package:syrenity_client_flutter/widgets/pages/app_loading.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/pages/about.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/setting_part_def.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/setting_parts.dart';
 
@@ -44,19 +46,38 @@ class WidgetSettingsSection extends SettingSection {
 }
 
 class SettingSections {
+  static user(context) => WidgetSettingsSection(
+    name: "User",
+    context: context,
+    widget: () => UserViewerModal(user: client.user),
+  );
+
+  static interface(context) => PartsSettingSection(
+    context: context,
+    name: "Interface",
+    parts: [SettingParts.showCopiedToClipboardFlout],
+  );
+
   static chat(context) => PartsSettingSection(
     context: context,
     name: "Chat",
     parts: [
       SettingParts.showSendMessageButton,
       SettingParts.showGifPickerButton,
+      SettingParts.showEmojiPickerButton,
     ],
   );
 
-  static widget(context) => WidgetSettingsSection(
-    name: "Widget",
+  static developer(context) => PartsSettingSection(
     context: context,
-    widget: () => Text("bye"),
+    name: "Developer",
+    parts: [SettingParts.developerMode],
+  );
+
+  static about(context) => WidgetSettingsSection(
+    name: "About",
+    context: context,
+    widget: () => AboutPage(),
   );
 
   static logout(context) => CallbackSettingSecttion(

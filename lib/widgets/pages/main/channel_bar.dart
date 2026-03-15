@@ -20,6 +20,10 @@ class _ChannelBarState extends State<ChannelBar> {
   int? _lastServerId;
 
   void load(int serverId) async {
+    setState(() {
+      channels = [];
+    });
+
     final loadedChannels = await client.channels.fetchChannelsForServer(
       serverId,
     );

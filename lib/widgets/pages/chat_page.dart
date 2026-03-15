@@ -4,6 +4,7 @@ import 'package:syrenity_client_flutter/main_callbacks.dart';
 import 'package:syrenity_client_flutter/theme.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/channel_bar.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/main_right.dart';
+import 'package:syrenity_client_flutter/widgets/pages/main/member_bar.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/self_section.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/server_bar.dart';
 
@@ -16,6 +17,7 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   bool drawerShown = false;
+  bool memberBarShown = false;
 
   @override
   void initState() {
@@ -25,6 +27,16 @@ class _ChatPageState extends State<ChatPage> {
           drawerShown = !drawerShown;
         } else {
           drawerShown = value;
+        }
+      });
+    };
+
+    MainCallbacks.setMemberBarVisibility = (value) {
+      setState(() {
+        if (value == null) {
+          memberBarShown = !memberBarShown;
+        } else {
+          memberBarShown = value;
         }
       });
     };
@@ -94,6 +106,8 @@ class _ChatPageState extends State<ChatPage> {
 
           // Main content
           Expanded(child: MainRight()),
+          if (memberBarShown)
+            SizedBox(width: SyrenityTheme.memberBarWidgth, child: MemberBar()),
         ],
       ),
     );

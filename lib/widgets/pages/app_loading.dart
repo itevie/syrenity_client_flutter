@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/main.dart';
 import 'package:syrenity_client_flutter/shared_prefs.dart';
+import 'package:syrenity_client_flutter/syrenity_client/events.dart';
 import 'package:syrenity_client_flutter/widgets/pages/login.dart';
 
 late void Function() reload;
@@ -38,9 +39,11 @@ class _PreMainAppState extends State<PreMainApp> {
       try {
         await client.login(storedToken);
 
-        setState(() {
-          token = storedToken;
-          loading = false;
+        client.events.on(SyEvents.ready, (_) {
+          setState(() {
+            token = storedToken;
+            loading = false;
+          });
         });
 
         return;
@@ -60,8 +63,10 @@ class _PreMainAppState extends State<PreMainApp> {
 
     await client.login(newToken, noWs: true);
 
-    setState(() {
-      token = newToken;
+    client.events.on(SyEvents.ready, (_) {
+      setState(() {
+        token = newToken;
+      });
     });
   }
 

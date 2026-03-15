@@ -1,35 +1,122 @@
 import 'package:syrenity_client_flutter/shared_prefs.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/setting_part_def.dart';
 
-final _showSendMessageButtonDefault = false;
-final _showGifPickerButtonDefault = true;
+enum SettingKeys {
+  showSendMessageButton(
+    storageKey: "chatbar_send_message_button",
+    defaultValue: false,
+  ),
+  showGifPickerButton(
+    storageKey: "chatbar_gif_picker_button",
+    defaultValue: true,
+  ),
+  showEmojiPickerButton(
+    storageKey: "chatbar_emoji_picker_button",
+    defaultValue: true,
+  ),
+
+  showCopiedToClipboardFlout(
+    storageKey: "show_copied_to_clipboard_flyout",
+    defaultValue: true,
+  ),
+
+  developerMode(storageKey: "developer_mode", defaultValue: false);
+
+  final String storageKey;
+  final bool defaultValue;
+
+  const SettingKeys({required this.storageKey, required this.defaultValue});
+}
 
 class SettingParts {
   static final showSendMessageButton = ChecklistSettingPart(
-    name: "Show Send Message Button",
+    name: "Send Message Button",
     description: "Show a send message button in the chatbar.",
     provideValue: () async {
       return SettingsStorage.instance.get<bool>(
-            "chatbar_send_message_button",
+            SettingKeys.showSendMessageButton.storageKey,
           ) ??
-          _showSendMessageButtonDefault;
+          SettingKeys.showSendMessageButton.defaultValue;
     },
-    defaultValue: _showSendMessageButtonDefault,
+    defaultValue: SettingKeys.showSendMessageButton.defaultValue,
     callback: (value) {
-      SettingsStorage.instance.set<bool>("chatbar_send_message_button", value);
+      SettingsStorage.instance.set<bool>(
+        SettingKeys.showSendMessageButton.storageKey,
+        value,
+      );
     },
   );
 
   static final showGifPickerButton = ChecklistSettingPart(
-    name: "Show Send Gif Picker Button",
+    name: "Gif Picker Button",
     description: "Show the gif picker in the charbar.",
     provideValue: () async {
-      return SettingsStorage.instance.get<bool>("chatbar_gif_picker_button") ??
-          _showGifPickerButtonDefault;
+      return SettingsStorage.instance.get<bool>(
+            SettingKeys.showGifPickerButton.storageKey,
+          ) ??
+          SettingKeys.showGifPickerButton.defaultValue;
     },
-    defaultValue: _showGifPickerButtonDefault,
+    defaultValue: SettingKeys.showGifPickerButton.defaultValue,
     callback: (value) {
-      SettingsStorage.instance.set<bool>("chatbar_gif_picker_button", value);
+      SettingsStorage.instance.set<bool>(
+        SettingKeys.showGifPickerButton.storageKey,
+        value,
+      );
+    },
+  );
+
+  static final showEmojiPickerButton = ChecklistSettingPart(
+    name: "Emoji Picker Button",
+    description: "Show the emoji picker in the charbar.",
+    provideValue: () async {
+      return SettingsStorage.instance.get<bool>(
+            SettingKeys.showEmojiPickerButton.storageKey,
+          ) ??
+          SettingKeys.showEmojiPickerButton.defaultValue;
+    },
+    defaultValue: SettingKeys.showEmojiPickerButton.defaultValue,
+    callback: (value) {
+      SettingsStorage.instance.set<bool>(
+        SettingKeys.showEmojiPickerButton.storageKey,
+        value,
+      );
+    },
+  );
+
+  static final showCopiedToClipboardFlout = ChecklistSettingPart(
+    name: "Copied To Clipboard",
+    description:
+        "Show the flyout in the top left when copying something to the clipboard.",
+    provideValue: () async {
+      return SettingsStorage.instance.get<bool>(
+            SettingKeys.showCopiedToClipboardFlout.storageKey,
+          ) ??
+          SettingKeys.showCopiedToClipboardFlout.defaultValue;
+    },
+    defaultValue: SettingKeys.showCopiedToClipboardFlout.defaultValue,
+    callback: (value) {
+      SettingsStorage.instance.set<bool>(
+        SettingKeys.showCopiedToClipboardFlout.storageKey,
+        value,
+      );
+    },
+  );
+
+  static final developerMode = ChecklistSettingPart(
+    name: "Developer Mode",
+    description: "Show copy IDs in context menus.",
+    provideValue: () async {
+      return SettingsStorage.instance.get<bool>(
+            SettingKeys.developerMode.storageKey,
+          ) ??
+          SettingKeys.developerMode.defaultValue;
+    },
+    defaultValue: SettingKeys.developerMode.defaultValue,
+    callback: (value) {
+      SettingsStorage.instance.set<bool>(
+        SettingKeys.developerMode.storageKey,
+        value,
+      );
     },
   );
 }

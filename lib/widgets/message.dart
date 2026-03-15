@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:syrenity_client_flutter/app_client.dart';
+import 'package:syrenity_client_flutter/shared_prefs.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/message.dart';
 import 'package:syrenity_client_flutter/theme.dart';
 import 'package:syrenity_client_flutter/widgets/context_menu.dart';
 import 'package:syrenity_client_flutter/widgets/copy_something.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/setting_parts.dart';
 
 class MessageWidget extends StatefulWidget {
   final SyMessage message;
@@ -21,27 +23,39 @@ class _MessageWidgetState extends State<MessageWidget> {
     final message = widget.message;
 
     return ContextMenu(
-      items: [
-        ContextMenuButton(
-          onPressed: () async {
-            // await message.delete();
-          },
-          label: "Edit",
-          icon: Icons.edit,
-        ),
-        ContextMenuButton(
-          onPressed: () async {
-            await message.delete();
-          },
-          label: "Delete",
-          icon: Icons.delete,
-          danger: true,
-        ),
-        ContextMenuSeparator(),
+      items:
+          () => [
+            ContextMenuButton(
+              onPressed: () async {
+                // await message.delete();
+              },
+              label: "Edit",
+              icon: Icons.edit,
+            ),
+            ContextMenuButton(
+              onPressed: () async {
+                await message.delete();
+              },
+              label: "Delete",
+              icon: Icons.delete,
+              danger: true,
+            ),
+            ContextMenuSeparator(),
 
-        makeCopyContextMenuButton(context, "Message Content", message.content),
-        makeCopyContextMenuButton(context, "Message ID", message.id.toString()),
-      ],
+            makeCopyContextMenuButton(
+              context,
+              "Message Content",
+              message.content,
+            ),
+            if (SettingsStorage.instance.getSetting<bool>(
+              SettingKeys.developerMode,
+            ))
+              makeCopyContextMenuButton(
+                context,
+                "Message ID",
+                message.id.toString(),
+              ),
+          ],
       child: Material(
         color: Colors.transparent,
         child: InkWell(

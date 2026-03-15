@@ -4,6 +4,8 @@ import 'package:syrenity_client_flutter/stores/channel_store.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/channel.dart';
 import 'package:flutter/services.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/setting_parts.dart';
+import 'package:syrenity_client_flutter/widgets/setting_listener.dart';
 
 final Map<int, String> channelDrafts = {};
 
@@ -134,14 +136,30 @@ class _MessageBarState extends State<MessageBar> {
               ),
             ),
 
-            IconButton(
-              icon: const Icon(Icons.gif_box_outlined),
-              onPressed: () {},
+            SettingListener(
+              setting: SettingKeys.showGifPickerButton,
+              child: IconButton(
+                icon: const Icon(Icons.gif_box_outlined),
+                onPressed: () {},
+              ),
             ),
 
-            IconButton(
-              icon: const Icon(Icons.emoji_emotions_outlined),
-              onPressed: () {},
+            SettingListener(
+              setting: SettingKeys.showEmojiPickerButton,
+              child: IconButton(
+                icon: const Icon(Icons.emoji_emotions_outlined),
+                onPressed: () {},
+              ),
+            ),
+
+            SettingListener(
+              setting: SettingKeys.showSendMessageButton,
+              child: IconButton(
+                onPressed: () {
+                  _sendMessage();
+                },
+                icon: const Icon(Icons.send),
+              ),
             ),
           ],
         ),

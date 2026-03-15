@@ -24,7 +24,7 @@ class ContextMenuSeparator extends ContextMenuItem {
 
 class ContextMenu extends StatefulWidget {
   final Widget child;
-  final List<ContextMenuItem> items;
+  final List<ContextMenuItem> Function() items;
   const ContextMenu({super.key, required this.child, required this.items});
 
   @override
@@ -49,7 +49,7 @@ class _ContextMenuState extends State<ContextMenu> {
         position.dx,
         position.dy,
       ),
-      items: widget.items.map((x) => buildMenuItem(x)).toList(),
+      items: widget.items().map((x) => buildMenuItem(x)).toList(),
     );
 
     if (result == 'edit') {

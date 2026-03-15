@@ -16,9 +16,20 @@ class SelfSection extends StatefulWidget {
 class _SelfSectionState extends State<SelfSection> {
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    if (client.scaryUser == null) {
+      return Container(
+        height: SyrenityTheme.bottomBarHeight,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+
+        decoration: BoxDecoration(color: colors.inversePrimary),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     final userStore = context.watch<UserStore>();
     final user = userStore[client.user.id]!;
-    final colors = Theme.of(context).colorScheme;
     final avatar = client.fileBase.from(user.avatar);
 
     return Container(

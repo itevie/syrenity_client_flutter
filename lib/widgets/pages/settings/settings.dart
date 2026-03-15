@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/setting_sections.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/settings_part_renderer.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -14,8 +15,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
   List<SettingSection> getSections() {
     return <SettingSection>[
+      SettingSections.user(context),
+      SettingSections.interface(context),
       SettingSections.chat(context),
-      SettingSections.widget(context),
+      SettingSections.developer(context),
+      SettingSections.about(context),
       SettingSections.logout(context),
     ];
   }
@@ -70,7 +74,12 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget buildContent() {
     switch (sections[selectedSection]) {
       case WidgetSettingsSection(:final widget):
-        return widget();
+        return Padding(padding: EdgeInsets.all(10), child: widget());
+      case PartsSettingSection(:final parts):
+        return Padding(
+          padding: EdgeInsets.all(10),
+          child: SettingsPartRenderer(parts: parts),
+        );
       default:
     }
 
