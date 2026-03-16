@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/shared_prefs.dart';
+import 'package:syrenity_client_flutter/syrenity_client/content_parser/lexer.dart';
+import 'package:syrenity_client_flutter/syrenity_client/content_parser/parser.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/message.dart';
 import 'package:syrenity_client_flutter/theme.dart';
 import 'package:syrenity_client_flutter/widgets/context_menu.dart';
 import 'package:syrenity_client_flutter/widgets/copy_something.dart';
+import 'package:syrenity_client_flutter/widgets/message_markdown.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/setting_parts.dart';
 
 class MessageWidget extends StatefulWidget {
@@ -21,6 +24,11 @@ class _MessageWidgetState extends State<MessageWidget> {
   @override
   Widget build(BuildContext context) {
     final message = widget.message;
+
+    final lexed = lex(message.content);
+    final parsed = new SyContentParser(lexed).parse();
+
+    print(parsed.tokens.map((x) => x.toString()));
 
     return ContextMenu(
       items:
@@ -96,7 +104,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
-                      Text(message.content),
+                      MessageMarkdown(parsed: parsed),
                     ],
                   ),
                 ),
