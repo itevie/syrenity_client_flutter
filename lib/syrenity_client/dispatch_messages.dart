@@ -1,4 +1,5 @@
 import 'package:syrenity_client_flutter/syrenity_client/client.dart';
+import 'package:syrenity_client_flutter/syrenity_client/models/custom_status.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/message.dart';
 import 'package:syrenity_client_flutter/syrenity_client/ws_messages.dart';
 
@@ -20,6 +21,13 @@ sealed class DispatchMessage {
           messageId: dispatch.originalPayload['message_id'],
         );
 
+      case "UserStatusUpdate":
+        return DispatchUserStatusUpdate(
+          status: SyCustomStatus.build(
+            client,
+            dispatch.originalPayload['status'],
+          ),
+        );
       case "ChannelStartTyping":
         return DispatchChannelStartTyping(
           channelId: dispatch.originalPayload['channel_id'],
@@ -35,6 +43,12 @@ class DispatchMessageCreate extends DispatchMessage {
   final SyMessage message;
 
   const DispatchMessageCreate({required this.message});
+}
+
+class DispatchUserStatusUpdate extends DispatchMessage {
+  final SyCustomStatus status;
+
+  const DispatchUserStatusUpdate({required this.status});
 }
 
 class DispatchMessageDelete extends DispatchMessage {

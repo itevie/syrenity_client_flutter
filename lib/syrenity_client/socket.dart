@@ -65,6 +65,10 @@ class SyWebsocketManager {
             client.events.emit(SyEvents.dispatchChannelStartTyping, payload);
             break;
 
+          case DispatchUserStatusUpdate(status: final status):
+            client.events.emit(SyEvents.dispatchUserStatusUpdate, status);
+            break;
+
           // ignore: unreachable_switch_default
           default:
             client.events.emit(

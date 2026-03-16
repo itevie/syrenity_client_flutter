@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/stores/user_store.dart';
 import 'package:syrenity_client_flutter/theme.dart';
+import 'package:syrenity_client_flutter/widgets/avatar_with_status.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/settings.dart';
 
 class SelfSection extends StatefulWidget {
@@ -30,7 +31,6 @@ class _SelfSectionState extends State<SelfSection> {
 
     final userStore = context.watch<UserStore>();
     final user = userStore[client.user.id]!;
-    final avatar = client.fileBase.from(user.avatar);
 
     return Container(
       height: SyrenityTheme.bottomBarHeight,
@@ -55,10 +55,7 @@ class _SelfSectionState extends State<SelfSection> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircleAvatar(
-                      backgroundImage:
-                          avatar != null ? NetworkImage(avatar) : null,
-                    ),
+                    AvatarWithStatus(userId: user.id),
                     const SizedBox(width: 8),
                     Text(
                       user.username,

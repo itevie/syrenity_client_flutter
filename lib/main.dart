@@ -4,6 +4,7 @@ import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/shared_prefs.dart';
 import 'package:syrenity_client_flutter/stores/channel_store.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
+import 'package:syrenity_client_flutter/stores/custom_status_store.dart';
 import 'package:syrenity_client_flutter/stores/server_store.dart';
 import 'package:syrenity_client_flutter/stores/user_store.dart';
 import 'package:syrenity_client_flutter/widgets/pages/app_loading.dart';
@@ -20,6 +21,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => userStore),
         ChangeNotifierProvider(create: (_) => channelStore),
         ChangeNotifierProvider(create: (_) => serverStore),
+        ChangeNotifierProvider(create: (_) => customStatuStore),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

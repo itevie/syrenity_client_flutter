@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/stores/server_store.dart';
 import 'package:syrenity_client_flutter/stores/user_store.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/member.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/server.dart';
 import 'package:syrenity_client_flutter/theme.dart';
+import 'package:syrenity_client_flutter/widgets/avatar_with_status.dart';
 import 'package:syrenity_client_flutter/widgets/modals/user_viewer.dart';
 import 'package:syrenity_client_flutter/widgets/show_dialog.dart';
 
@@ -23,6 +23,23 @@ class _MemberBarState extends State<MemberBar> {
 
   void load(SyServer server) async {
     final loadedMembers = await server.members.fetchAll();
+
+    print(loadedMembers.map((x) => x.status?.visibility));
+
+    loadedMembers.sort((a, b) {
+      final aHidden =
+          a.status == null ||
+          a.status?.visibility == null ||
+          a.status!.visibility == "invisible";
+      final bHidden =
+          b.status == null ||
+          b.status?.visibility == null ||
+          b.status!.visibility == "invisible";
+
+      if (aHidden && !bHidden) return 1;
+      if (!aHidden && bHidden) return -1;
+      return 0;
+    });
 
     setState(() {
       members = loadedMembers;
@@ -81,14 +98,7 @@ class _MemberBarState extends State<MemberBar> {
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 8,
                         ),
-                        leading: CircleAvatar(
-                          radius: 16,
-                          backgroundImage: NetworkImage(
-                            client.fileBase.from(
-                              user.avatar ?? client.fileBase.badUrl,
-                            )!,
-                          ),
-                        ),
+                        leading: AvatarWithStatus(userId: user.id, size: 16),
                         title: Text(
                           user.username,
                           overflow: TextOverflow.ellipsis,

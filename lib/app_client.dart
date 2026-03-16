@@ -1,6 +1,7 @@
 import 'package:syrenity_client_flutter/main_callbacks.dart';
 import 'package:syrenity_client_flutter/shared_prefs.dart';
 import 'package:syrenity_client_flutter/stores/channel_store.dart';
+import 'package:syrenity_client_flutter/stores/custom_status_store.dart';
 import 'package:syrenity_client_flutter/stores/server_store.dart';
 import 'package:syrenity_client_flutter/stores/user_store.dart';
 import 'package:syrenity_client_flutter/syrenity_client/client.dart';
@@ -46,5 +47,13 @@ Future<void> setupClient({bool login = true}) async {
 
   client.events.on(SyEvents.error, (error) {
     MainCallbacks.showError!(error);
+  });
+
+  client.events.on(SyEvents.dispatchUserStatusUpdate, (status) {
+    customStatuStore.set(status);
+  });
+
+  client.events.on(SyEvents.createCustomStatus, (status) {
+    customStatuStore.set(status);
   });
 }

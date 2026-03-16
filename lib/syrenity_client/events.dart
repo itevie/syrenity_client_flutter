@@ -1,6 +1,7 @@
 import 'package:syrenity_client_flutter/syrenity_client/client.dart';
 import 'package:syrenity_client_flutter/syrenity_client/dispatch_messages.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/channel.dart';
+import 'package:syrenity_client_flutter/syrenity_client/models/custom_status.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/message.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/server.dart';
 import 'package:syrenity_client_flutter/syrenity_client/models/user.dart';
@@ -34,6 +35,10 @@ class CreateChannelClass extends SyEvent<SyChannel> {
   const CreateChannelClass() : super("create_channel_class");
 }
 
+class CreateCustomClass extends SyEvent<SyCustomStatus> {
+  const CreateCustomClass() : super("create_custom_status");
+}
+
 // Dispatches
 class EvDispatchMessageCreate extends SyEvent<SyMessage> {
   const EvDispatchMessageCreate() : super("dispatch_message_create");
@@ -41,6 +46,10 @@ class EvDispatchMessageCreate extends SyEvent<SyMessage> {
 
 class EvDispatchMessageDelete extends SyEvent<int> {
   const EvDispatchMessageDelete() : super("dispatch_message_delete");
+}
+
+class EvDispatchUserStatusUpdate extends SyEvent<SyCustomStatus> {
+  const EvDispatchUserStatusUpdate() : super("dispatch_user_status_update");
 }
 
 class EvDispatchChannelStartTyping extends SyEvent<DispatchChannelStartTyping> {
@@ -54,6 +63,9 @@ class SyEvents {
   static final createUser = CreateUserClass();
   static final createChannel = CreateChannelClass();
   static final createServer = CreateServerClass();
+  static final createCustomStatus = CreateCustomClass();
+
+  static final dispatchUserStatusUpdate = EvDispatchUserStatusUpdate();
 
   static final dispatchCreateMessage = EvDispatchMessageCreate();
   static final dispatchDeleteMessage = EvDispatchMessageDelete();
