@@ -25,7 +25,13 @@ class ContextMenuSeparator extends ContextMenuItem {
 class ContextMenu extends StatefulWidget {
   final Widget child;
   final List<ContextMenuItem> Function() items;
-  const ContextMenu({super.key, required this.child, required this.items});
+  final bool onTapToo;
+  const ContextMenu({
+    super.key,
+    required this.child,
+    required this.items,
+    this.onTapToo = false,
+  });
 
   @override
   State<StatefulWidget> createState() => _ContextMenuState();
@@ -41,7 +47,7 @@ class _ContextMenuState extends State<ContextMenu> {
   void _showContextMenu(BuildContext context, Offset other) async {
     final position = _tapPosition ?? other;
 
-    final result = await showMenu(
+    await showMenu(
       context: context,
       position: RelativeRect.fromLTRB(
         position.dx,
@@ -51,12 +57,6 @@ class _ContextMenuState extends State<ContextMenu> {
       ),
       items: widget.items().map((x) => buildMenuItem(x)).toList(),
     );
-
-    if (result == 'edit') {
-      print("Edit clicked");
-    } else if (result == 'delete') {
-      print("Delete clicked");
-    }
   }
 
   PopupMenuEntry buildMenuItem(ContextMenuItem item) {
@@ -91,10 +91,12 @@ class _ContextMenuState extends State<ContextMenu> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTapDown: _storePosition,
+      onTap: () {
+        if (widget.onTapToo) _showContextMenu(context, _tapPosition!);
+      },
       onSecondaryTapDown: (details) {
         _showContextMenu(context, details.globalPosition);
       },

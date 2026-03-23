@@ -20,6 +20,11 @@ enum SettingKeys {
     defaultValue: true,
   ),
 
+  parseMarkdownInMessages(
+    storageKey: "parse_markdown_in_messages",
+    defaultValue: true,
+  ),
+
   developerMode(storageKey: "developer_mode", defaultValue: false);
 
   final String storageKey;
@@ -115,6 +120,24 @@ class SettingParts {
     callback: (value) {
       SettingsStorage.instance.set<bool>(
         SettingKeys.developerMode.storageKey,
+        value,
+      );
+    },
+  );
+
+  static final markdown = ChecklistSettingPart(
+    name: "Markdown",
+    description: "Show markdown in messages",
+    provideValue: () async {
+      return SettingsStorage.instance.get<bool>(
+            SettingKeys.parseMarkdownInMessages.storageKey,
+          ) ??
+          SettingKeys.parseMarkdownInMessages.defaultValue;
+    },
+    defaultValue: SettingKeys.parseMarkdownInMessages.defaultValue,
+    callback: (value) {
+      SettingsStorage.instance.set<bool>(
+        SettingKeys.parseMarkdownInMessages.storageKey,
         value,
       );
     },

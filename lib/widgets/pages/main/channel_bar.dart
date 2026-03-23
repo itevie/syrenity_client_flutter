@@ -4,9 +4,8 @@ import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/main_callbacks.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/stores/server_store.dart';
-import 'package:syrenity_client_flutter/syrenity_client/models/channel.dart';
-import 'package:syrenity_client_flutter/syrenity_client/models/server.dart';
 import 'package:syrenity_client_flutter/theme.dart';
+import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 class ChannelBar extends StatefulWidget {
   const ChannelBar({super.key});

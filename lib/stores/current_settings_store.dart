@@ -3,8 +3,14 @@ import 'package:flutter/material.dart';
 class CurrentSettingsState extends ChangeNotifier {
   int? serverId;
   int? channelId;
+  bool memberBarShown = false;
 
-  void setServer(int id) {
+  void setMemberBarShown(bool val) {
+    memberBarShown = val;
+    notifyListeners();
+  }
+
+  void setServer(int? id) {
     serverId = id;
     channelId = null;
     notifyListeners();

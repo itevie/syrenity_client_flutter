@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:syrenity_client_flutter/syrenity_client/models/channel.dart';
+import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 class ChannelStore extends ChangeNotifier {
   final Map<int, SyChannel> _channels = {};

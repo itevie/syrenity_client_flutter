@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syrenity_client_flutter/stores/channel_store.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
-import 'package:syrenity_client_flutter/syrenity_client/models/channel.dart';
 import 'package:flutter/services.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/setting_parts.dart';
 import 'package:syrenity_client_flutter/widgets/setting_listener.dart';
+import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 final Map<int, String> channelDrafts = {};
 

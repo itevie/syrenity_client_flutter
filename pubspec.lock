@@ -334,6 +334,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
+  syrenity_flutter_client_api:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "83ce671a9f471bbc88eb2d605045bff0f2b0eb4f"
+      url: "https://github.com/itevie/syrenity_flutter_client_api.git"
+    source: git
+    version: "1.0.0"
   term_glyph:
     dependency: transitive
     description:

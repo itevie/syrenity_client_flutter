@@ -1,3 +1,3 @@
-# syrenity_client_flutter
+# Syrenity Flutter Interface
 
-A new Flutter project.
+The main interface for [Syrenity](https://github.com/itevie/Syrenity).

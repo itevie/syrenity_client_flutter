@@ -4,13 +4,11 @@ import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/main_callbacks.dart';
 import 'package:syrenity_client_flutter/stores/channel_store.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
-import 'package:syrenity_client_flutter/syrenity_client/events.dart';
-import 'package:syrenity_client_flutter/syrenity_client/models/channel.dart';
-import 'package:syrenity_client_flutter/syrenity_client/models/message.dart';
 import 'package:syrenity_client_flutter/theme.dart';
 import 'package:syrenity_client_flutter/widgets/message.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/message_bar.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/typing_indicator.dart';
+import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 class MainRight extends StatefulWidget {
   const MainRight({super.key});
@@ -202,10 +200,9 @@ class _MainRightState extends State<MainRight> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final isDesktop = MediaQuery.of(context).size.width >= 600;
+    final currentSettings = context.watch<CurrentSettingsState>();
 
-    final channelId = context.select<CurrentSettingsState, int?>(
-      (s) => s.channelId,
-    );
+    final channelId = currentSettings.channelId;
 
     _onChannelChanged(channelId);
 
@@ -239,15 +236,18 @@ class _MainRightState extends State<MainRight> {
                         const SizedBox(width: 8),
                       ],
                       Text("#${channel?.name ?? "Loading..."}"),
-                      Spacer(),
-                      IconButton(
-                        icon: Icon(Icons.group),
-                        onPressed: () {
-                          if (MainCallbacks.setMemberBarVisibility != null) {
-                            MainCallbacks.setMemberBarVisibility!(null);
-                          }
-                        },
-                      ),
+                      if (!currentSettings.memberBarShown) ...[
+                        Spacer(),
+
+                        IconButton(
+                          icon: Icon(Icons.group),
+                          onPressed: () {
+                            if (MainCallbacks.setMemberBarVisibility != null) {
+                              MainCallbacks.setMemberBarVisibility!(null);
+                            }
+                          },
+                        ),
+                      ],
                     ],
                   ),
                 ),

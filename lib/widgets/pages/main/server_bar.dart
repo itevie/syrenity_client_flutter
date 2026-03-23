@@ -3,8 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/main_callbacks.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
-import 'package:syrenity_client_flutter/syrenity_client/models/server.dart';
 import 'package:syrenity_client_flutter/theme.dart';
+import 'package:syrenity_client_flutter/widgets/context_menu.dart';
+import 'package:syrenity_client_flutter/widgets/context_menus/server_cm.dart';
+import 'package:syrenity_client_flutter/widgets/modals/join_create_server.dart';
+import 'package:syrenity_client_flutter/widgets/pages/application_discovery.dart';
+import 'package:syrenity_client_flutter/widgets/show_dialog.dart';
+import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 class ServerBar extends StatefulWidget {
   const ServerBar({super.key});
@@ -15,11 +20,49 @@ class ServerBar extends StatefulWidget {
 
 class _ServerBarWidget extends State<ServerBar> {
   List<SyServer> servers = [];
+  void Function(SyMember)? memberAddCallback;
+  void Function(SyMember)? memberRemoveCallback;
 
   @override
   void initState() {
     super.initState();
+
+    memberAddCallback = (member) {
+      if (member.userId != client.user.id) return;
+      reload();
+    };
+
+    client.events.on(SyEvents.dispatchServerMemberAdd, memberAddCallback!);
+
+    memberRemoveCallback = (member) {
+      if (member.userId != client.user.id) return;
+      reload();
+    };
+
+    client.events.on(
+      SyEvents.dispatchServerMemberRemove,
+      memberRemoveCallback!,
+    );
+
     reload();
+  }
+
+  @override
+  void dispose() {
+    if (memberAddCallback != null) {
+      client.events.off(SyEvents.dispatchServerMemberAdd, memberAddCallback!);
+      memberAddCallback = null;
+    }
+
+    if (memberRemoveCallback != null) {
+      client.events.off(
+        SyEvents.dispatchServerMemberRemove,
+        memberRemoveCallback!,
+      );
+      memberRemoveCallback = null;
+    }
+
+    super.dispose();
   }
 
   void reload() async {
@@ -62,12 +105,15 @@ class _ServerBarWidget extends State<ServerBar> {
           child: Container(
             color: colors.primaryContainer,
             child: ListView(
-              children:
-                  servers.map((x) {
-                    final isSelected = currentSettings.serverId == x.id;
-                    final avatar = client.fileBase.from(x.avatar);
+              children: [
+                ...servers.map((server) {
+                  final isSelected = currentSettings.serverId == server.id;
+                  final avatar = client.fileBase.from(server.avatar);
 
-                    return Padding(
+                  return ContextMenu(
+                    items: makeServerContextMenu(context, server),
+
+                    child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 6),
                       child: MouseRegion(
                         cursor: SystemMouseCursors.click,
@@ -77,20 +123,26 @@ class _ServerBarWidget extends State<ServerBar> {
                           child: InkWell(
                             customBorder: const CircleBorder(),
                             onTap: () {
+                              if (MainCallbacks.setPage != null) {
+                                MainCallbacks.setPage!(null);
+                              }
+
                               context.read<CurrentSettingsState>().setServer(
-                                x.id,
+                                server.id,
                               );
                             },
                             child: Tooltip(
                               waitDuration: Duration(milliseconds: 500),
-                              message: x.name,
+                              message: server.name,
                               child: CircleAvatar(
+                                key: Key(server.id.toString()),
                                 radius: 28,
                                 backgroundColor:
                                     isSelected
                                         ? Colors.white
                                         : Colors.transparent,
                                 child: CircleAvatar(
+                                  key: Key(server.id.toString()),
                                   radius: 25,
                                   backgroundColor: colors.secondaryContainer,
                                   backgroundImage:
@@ -99,7 +151,7 @@ class _ServerBarWidget extends State<ServerBar> {
                                           : null,
                                   child:
                                       avatar == null
-                                          ? Text(x.id.toString())
+                                          ? Text(server.id.toString())
                                           : null,
                                 ),
                               ),
@@ -107,8 +159,65 @@ class _ServerBarWidget extends State<ServerBar> {
                           ),
                         ),
                       ),
-                    );
-                  }).toList(),
+                    ),
+                  );
+                }),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Column(
+                    children: [
+                      // First icon
+                      Material(
+                        color: Colors.transparent,
+                        shape: const CircleBorder(),
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
+                          onTap: () {
+                            showSyDialog(context, JoinCreateServerDialog());
+                          },
+                          child: CircleAvatar(
+                            radius: 28,
+                            backgroundColor: Colors.transparent,
+                            child: CircleAvatar(
+                              radius: 25,
+                              backgroundColor: Colors.transparent,
+                              child: const Icon(Icons.add, size: 28),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 12), // spacing between icons
+                      // Second icon
+                      Material(
+                        color: Colors.transparent,
+                        shape: const CircleBorder(),
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
+                          onTap: () {
+                            if (MainCallbacks.setPage != null) {
+                              MainCallbacks.setPage!(ApplicationDiscovery());
+                            }
+
+                            context.read<CurrentSettingsState>().setServer(
+                              null,
+                            );
+                          },
+                          child: CircleAvatar(
+                            radius: 28,
+                            backgroundColor: Colors.transparent,
+                            child: CircleAvatar(
+                              radius: 25,
+                              backgroundColor: Colors.transparent,
+                              child: const Icon(Icons.smart_toy, size: 28),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),

@@ -18,6 +18,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   bool drawerShown = false;
   bool memberBarShown = false;
+  Widget? page;
 
   @override
   void initState() {
@@ -44,6 +45,13 @@ class _ChatPageState extends State<ChatPage> {
     MainCallbacks.showError = (error) {
       showErrorPrompt(context, error.toString());
     };
+
+    MainCallbacks.setPage = (givenPage) {
+      setState(() {
+        page = givenPage;
+      });
+    };
+
     super.initState();
   }
 
@@ -79,7 +87,7 @@ class _ChatPageState extends State<ChatPage> {
             offstage: !(isDesktop || drawerShown),
             child: Container(
               width:
-                  showMobileDrawer
+                  showMobileDrawer || page != null
                       ? MediaQuery.of(context).size.width
                       : SyrenityTheme.serverChannelBarWidth,
               color: colors.secondaryContainer,
@@ -93,8 +101,8 @@ class _ChatPageState extends State<ChatPage> {
                           width: SyrenityTheme.serverBarWidth,
                           child: ServerBar(),
                         ),
-                        // Channels (keeps state alive)
-                        Expanded(child: ChannelBar()),
+                        if (page == null) Expanded(child: ChannelBar()),
+                        if (page != null) Expanded(child: page!),
                       ],
                     ),
                   ),
@@ -104,10 +112,15 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
 
-          // Main content
-          Expanded(child: MainRight()),
+          if (page == null && !(!isDesktop && !memberBarShown))
+            Expanded(child: MainRight()),
           if (memberBarShown)
-            SizedBox(width: SyrenityTheme.memberBarWidgth, child: MemberBar()),
+            isDesktop
+                ? SizedBox(
+                  width: isDesktop ? SyrenityTheme.memberBarWidgth : null,
+                  child: MemberBar(),
+                )
+                : Expanded(child: MemberBar()),
         ],
       ),
     );

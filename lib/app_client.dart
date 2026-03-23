@@ -2,10 +2,10 @@ import 'package:syrenity_client_flutter/main_callbacks.dart';
 import 'package:syrenity_client_flutter/shared_prefs.dart';
 import 'package:syrenity_client_flutter/stores/channel_store.dart';
 import 'package:syrenity_client_flutter/stores/custom_status_store.dart';
+import 'package:syrenity_client_flutter/stores/member_store.dart';
 import 'package:syrenity_client_flutter/stores/server_store.dart';
 import 'package:syrenity_client_flutter/stores/user_store.dart';
-import 'package:syrenity_client_flutter/syrenity_client/client.dart';
-import 'package:syrenity_client_flutter/syrenity_client/events.dart';
+import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 late SyrenityClient client;
 bool ready = false;
@@ -43,6 +43,10 @@ Future<void> setupClient({bool login = true}) async {
 
   client.events.on(SyEvents.createUser, (user) {
     userStore.set(user);
+  });
+
+  client.events.on(SyEvents.createMemberClass, (member) {
+    memberStore.set(member);
   });
 
   client.events.on(SyEvents.error, (error) {

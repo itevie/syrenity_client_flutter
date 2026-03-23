@@ -65,6 +65,7 @@ class SettingSections {
       SettingParts.showSendMessageButton,
       SettingParts.showGifPickerButton,
       SettingParts.showEmojiPickerButton,
+      SettingParts.markdown,
     ],
   );
 

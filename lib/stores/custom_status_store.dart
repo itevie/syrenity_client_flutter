@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:syrenity_client_flutter/syrenity_client/models/custom_status.dart';
+import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 class CustomStatusStore extends ChangeNotifier {
   final Map<int, SyCustomStatus> _customStatuses = {};

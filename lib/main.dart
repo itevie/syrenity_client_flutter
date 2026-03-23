@@ -5,12 +5,14 @@ import 'package:syrenity_client_flutter/shared_prefs.dart';
 import 'package:syrenity_client_flutter/stores/channel_store.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/stores/custom_status_store.dart';
+import 'package:syrenity_client_flutter/stores/member_store.dart';
 import 'package:syrenity_client_flutter/stores/server_store.dart';
 import 'package:syrenity_client_flutter/stores/user_store.dart';
 import 'package:syrenity_client_flutter/widgets/pages/app_loading.dart';
 import 'package:syrenity_client_flutter/widgets/pages/chat_page.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await SettingsStorage.instance.init();
   await setupClient();
 
@@ -19,6 +21,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => currentSettingsStore),
         ChangeNotifierProvider(create: (_) => userStore),
+        ChangeNotifierProvider(create: (_) => memberStore),
         ChangeNotifierProvider(create: (_) => channelStore),
         ChangeNotifierProvider(create: (_) => serverStore),
         ChangeNotifierProvider(create: (_) => customStatuStore),
@@ -68,7 +71,7 @@ class MainApp extends StatelessWidget {
 
       home: Scaffold(
         // appBar: AppBar(title: const Text("Syrenity")),
-        body: ChatPage(),
+        body: SafeArea(child: ChatPage()),
       ),
     );
   }

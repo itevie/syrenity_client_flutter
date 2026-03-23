@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syrenity_client_flutter/main_callbacks.dart';
-import 'package:syrenity_client_flutter/syrenity_client/content_parser/parser.dart';
-import 'package:syrenity_client_flutter/syrenity_client/content_parser/parser_tokens.dart';
+import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 class MessageMarkdown extends StatelessWidget {
   final SyParserResponse parsed;

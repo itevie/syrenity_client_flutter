@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/stores/custom_status_store.dart';
@@ -51,15 +54,21 @@ class _AvatarWithStatusState extends State<AvatarWithStatus> {
         Positioned(
           bottom: 0,
           right: 0,
-          child: Container(
-            width: 12,
-            height: 12,
-            decoration: BoxDecoration(
-              color: _statusColor(status?.visibility),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Theme.of(context).colorScheme.surface,
-                width: 2,
+          child: Tooltip(
+            message:
+                status?.lastSeen == null || status?.visibility != "invisible"
+                    ? ""
+                    : "Last seen ${DateFormat.yMd().add_jm().format(status!.lastSeen!)}",
+            child: Container(
+              width: min(widget.size / 1.25, 20),
+              height: min(widget.size / 1.25, 20),
+              decoration: BoxDecoration(
+                color: _statusColor(status?.visibility),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.surface,
+                  width: 2,
+                ),
               ),
             ),
           ),

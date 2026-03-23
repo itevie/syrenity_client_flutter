@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:syrenity_client_flutter/main_callbacks.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/stores/server_store.dart';
 import 'package:syrenity_client_flutter/stores/user_store.dart';
-import 'package:syrenity_client_flutter/syrenity_client/models/member.dart';
-import 'package:syrenity_client_flutter/syrenity_client/models/server.dart';
 import 'package:syrenity_client_flutter/theme.dart';
 import 'package:syrenity_client_flutter/widgets/avatar_with_status.dart';
+import 'package:syrenity_client_flutter/widgets/inline_username.dart';
 import 'package:syrenity_client_flutter/widgets/modals/user_viewer.dart';
 import 'package:syrenity_client_flutter/widgets/show_dialog.dart';
+import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 class MemberBar extends StatefulWidget {
   const MemberBar({super.key});
@@ -74,8 +75,28 @@ class _MemberBarState extends State<MemberBar> {
         Container(
           height: SyrenityTheme.topBarHeight,
           color: colors.surfaceContainer,
-          // color: colors.inversePrimary,
-          child: Center(child: const Text("Members")),
+          child: Stack(
+            children: [
+              // Centered title (true center)
+              const Center(child: Text("Members")),
+
+              // Left icon
+              Align(
+                alignment: Alignment.centerRight,
+                child:
+                    !currentSettings.memberBarShown
+                        ? IconButton(
+                          icon: Icon(Icons.group),
+                          onPressed: () {
+                            if (MainCallbacks.setMemberBarVisibility != null) {
+                              MainCallbacks.setMemberBarVisibility!(null);
+                            }
+                          },
+                        )
+                        : SizedBox.shrink(),
+              ),
+            ],
+          ),
         ),
         Expanded(
           child: Column(
@@ -99,10 +120,7 @@ class _MemberBarState extends State<MemberBar> {
                           horizontal: 8,
                         ),
                         leading: AvatarWithStatus(userId: user.id, size: 16),
-                        title: Text(
-                          user.username,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        title: InlineUsername(user: user.id, bold: false),
                         hoverColor: colors.primary.withValues(alpha: 0.08),
                         onTap: () {
                           showSyDialog(context, UserViewerModal(user: user));

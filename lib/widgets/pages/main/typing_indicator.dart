@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/stores/user_store.dart';
-import 'package:syrenity_client_flutter/syrenity_client/dispatch_messages.dart';
-import 'package:syrenity_client_flutter/syrenity_client/events.dart';
-import 'package:syrenity_client_flutter/syrenity_client/models/message.dart';
+import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 typedef _UserTyping = (int userId, DateTime startedAt);
 

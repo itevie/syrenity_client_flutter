@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/main.dart';
 import 'package:syrenity_client_flutter/shared_prefs.dart';
-import 'package:syrenity_client_flutter/syrenity_client/events.dart';
 import 'package:syrenity_client_flutter/widgets/pages/login.dart';
+import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 late void Function() reload;
 
@@ -17,6 +17,8 @@ class PreMainApp extends StatefulWidget {
 class _PreMainAppState extends State<PreMainApp> {
   String? token;
   bool loading = true;
+  bool failure = false;
+  Function(String?)? disconnectEvent;
 
   @override
   void initState() {
@@ -29,10 +31,34 @@ class _PreMainAppState extends State<PreMainApp> {
       });
     };
 
+    disconnectEvent = (reason) async {
+      setState(() {
+        loading = true;
+      });
+
+      while (true) {
+        await Future.delayed(Duration(seconds: 2));
+        final result = await _checkToken();
+        if (result) break;
+      }
+    };
+
+    client.events.on(SyEvents.disconnect, disconnectEvent!);
+
     _checkToken();
   }
 
-  Future<void> _checkToken() async {
+  @override
+  void dispose() {
+    super.dispose();
+
+    if (disconnectEvent != null) {
+      client.events.off(SyEvents.disconnect, disconnectEvent!);
+      disconnectEvent = null;
+    }
+  }
+
+  Future<bool> _checkToken() async {
     final storedToken = SettingsStorage.instance.get<String>("token");
 
     if (storedToken != null) {
@@ -46,15 +72,17 @@ class _PreMainAppState extends State<PreMainApp> {
           });
         });
 
-        return;
+        return true;
       } catch (e) {
-        await SettingsStorage.instance.remove("token");
+        return false;
       }
     }
 
     setState(() {
       loading = false;
     });
+
+    return false;
   }
 
   Future<void> _onLogin(String newToken) async {
@@ -73,7 +101,29 @@ class _PreMainAppState extends State<PreMainApp> {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 8),
+              const Text("Connecting..."),
+              const SizedBox(height: 4),
+              ElevatedButton.icon(
+                onPressed: () {
+                  setState(() {
+                    loading = false;
+                    token = null;
+                  });
+                },
+                label: const Text("Logout"),
+                icon: const Icon(Icons.logout),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     if (token == null) {
