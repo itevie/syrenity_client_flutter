@@ -111,7 +111,7 @@ class _ServerBarWidget extends State<ServerBar> {
                   final avatar = client.fileBase.from(server.avatar);
 
                   return ContextMenu(
-                    items: makeServerContextMenu(context, server),
+                    items: () => makeServerContextMenu(context, server),
 
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 6),

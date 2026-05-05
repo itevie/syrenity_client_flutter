@@ -125,6 +125,12 @@ class SettingParts {
     },
   );
 
+  static final developerShowBots = PageSwitchSettingPart(
+    name: "Manage Applications",
+    description: "Manage your bots",
+    onTap: () {},
+  );
+
   static final markdown = ChecklistSettingPart(
     name: "Markdown",
     description: "Show markdown in messages",

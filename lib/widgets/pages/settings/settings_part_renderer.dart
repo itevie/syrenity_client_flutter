@@ -16,33 +16,73 @@ class _SettingsPartRendererState extends State<SettingsPartRenderer> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ...widget.parts.map(
-          (part) => Card(
-            margin: const EdgeInsets.symmetric(vertical: 4),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  Expanded(
-                    // <-- important
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          part.name,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(part.description),
-                      ],
+        ...widget.parts.map((part) {
+          return switch (part) {
+            ChecklistSettingPart() => Card(
+              margin: const EdgeInsets.symmetric(vertical: 4),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            part.name,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(part.description),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  _PartInput(part: part),
-                ],
+                    const SizedBox(width: 12),
+                    _PartInput(part: part),
+                  ],
+                ),
               ),
             ),
-          ),
-        ),
+            SeperatorSettingPart(:final name) => Row(
+              children: [
+                Text(name),
+                const SizedBox(width: 8),
+                const Expanded(child: Divider()),
+              ],
+            ),
+            PageSwitchSettingPart() => Card(
+              margin: const EdgeInsets.symmetric(vertical: 4),
+              child: InkWell(
+                onTap: part.onTap,
+                borderRadius: BorderRadius.circular(
+                  12,
+                ), // optional, matches Card
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              part.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(part.description),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Icon(Icons.chevron_right),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          };
+        }),
       ],
     );
   }
@@ -62,16 +102,23 @@ class _PartInputState extends State<_PartInput> {
   @override
   void initState() {
     super.initState();
-    currentValue = widget.part.defaultValue;
+
+    if (widget.part is ChecklistSettingPart) {
+      currentValue = (widget.part as ChecklistSettingPart).defaultValue;
+    }
+
     loadValue();
   }
 
   void loadValue() async {
-    final loadedValue = await widget.part.provideValue();
+    if (widget.part is ChecklistSettingPart) {
+      final loadedValue =
+          await (widget.part as ChecklistSettingPart).provideValue();
 
-    setState(() {
-      currentValue = loadedValue;
-    });
+      setState(() {
+        currentValue = loadedValue;
+      });
+    }
   }
 
   @override

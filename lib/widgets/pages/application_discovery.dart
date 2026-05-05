@@ -2,7 +2,7 @@ import 'package:dawn_ui_flutter/dawn_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/theme.dart';
-import 'package:syrenity_client_flutter/widgets/avatar_with_status.dart';
+import 'package:syrenity_client_flutter/widgets/application_widget.dart';
 import 'package:syrenity_client_flutter/widgets/context_menu.dart';
 import 'package:syrenity_client_flutter/widgets/show_top_overlay.dart';
 import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
@@ -59,8 +59,10 @@ class _ApplicationDiscoveryState extends State<ApplicationDiscovery> {
                       items: () => [ContextMenuSeparator()],
                       child: Card(
                         clipBehavior: Clip.hardEdge,
-                        child: InkWell(
-                          onTap: () async {
+                        child: createApplicationWidget(
+                          context,
+                          application,
+                          () async {
                             final servers = (await client.servers.fetchAll())
                                 .where((x) => x.ownerId == client.user.id);
 
@@ -82,34 +84,6 @@ class _ApplicationDiscoveryState extends State<ApplicationDiscovery> {
                               "Added ${application.bot.username} to ${servers.firstWhere((x) => x.id == selector).name}",
                             );
                           },
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Column(
-                              children: [
-                                AvatarWithStatus(
-                                  userId: application.botAccount,
-                                  size: 64,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  application.applicationName,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                Text(
-                                  "By ${application.owner.username}",
-                                  style: const TextStyle(fontSize: 12),
-                                ),
-                                const Divider(),
-                                Text(
-                                  application.description ?? "No Description",
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          ),
                         ),
                       ),
                     ),

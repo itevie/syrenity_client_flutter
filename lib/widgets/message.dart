@@ -4,8 +4,8 @@ import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/shared_prefs.dart';
 import 'package:syrenity_client_flutter/theme.dart';
 import 'package:syrenity_client_flutter/widgets/context_menu.dart';
+import 'package:syrenity_client_flutter/widgets/context_menus/message_cm.dart';
 import 'package:syrenity_client_flutter/widgets/context_menus/server_user_avatar.dart';
-import 'package:syrenity_client_flutter/widgets/copy_something.dart';
 import 'package:syrenity_client_flutter/widgets/inline_username.dart';
 import 'package:syrenity_client_flutter/widgets/message_markdown.dart';
 import 'package:syrenity_client_flutter/widgets/modals/user_viewer.dart';
@@ -82,43 +82,19 @@ class _MessageWidgetState extends State<MessageWidget> {
               Expanded(
                 child: ContextMenu(
                   items:
-                      () => [
-                        ContextMenuButton(
-                          onPressed: () async {
-                            setState(() {
-                              controller.value = TextEditingValue(
-                                text: message.content,
-                              );
-                              editing = true;
-                            });
-                          },
-                          label: "Edit",
-                          icon: Icons.edit,
-                        ),
-                        ContextMenuButton(
-                          onPressed: () async {
-                            await message.delete();
-                          },
-                          label: "Delete",
-                          icon: Icons.delete,
-                          danger: true,
-                        ),
-                        ContextMenuSeparator(),
-
-                        makeCopyContextMenuButton(
-                          context,
-                          "Message Content",
-                          message.content,
-                        ),
-                        if (SettingsStorage.instance.getSetting<bool>(
-                          SettingKeys.developerMode,
-                        ))
-                          makeCopyContextMenuButton(
-                            context,
-                            "Message ID",
-                            message.id.toString(),
-                          ),
-                      ],
+                      () => makeMessageContextMenu(
+                        context,
+                        client.user,
+                        message,
+                        edit: () {
+                          setState(() {
+                            controller.value = TextEditingValue(
+                              text: message.content,
+                            );
+                            editing = true;
+                          });
+                        },
+                      ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,

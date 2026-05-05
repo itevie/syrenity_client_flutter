@@ -62,9 +62,11 @@ class SettingSections {
     context: context,
     name: "Chat",
     parts: [
+      SeperatorSettingPart("Chatbar"),
       SettingParts.showSendMessageButton,
       SettingParts.showGifPickerButton,
       SettingParts.showEmojiPickerButton,
+      SeperatorSettingPart("Messages"),
       SettingParts.markdown,
     ],
   );
@@ -72,7 +74,7 @@ class SettingSections {
   static developer(context) => PartsSettingSection(
     context: context,
     name: "Developer",
-    parts: [SettingParts.developerMode],
+    parts: [SettingParts.developerMode, SettingParts.developerShowBots],
   );
 
   static about(context) => WidgetSettingsSection(
