@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:syrenity_client_flutter/widgets/pages/settings/setting_parts.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/main_setting_parts.dart';
 
 class SettingsStorage {
   SettingsStorage._privateConstructor();

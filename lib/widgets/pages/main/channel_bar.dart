@@ -5,6 +5,9 @@ import 'package:syrenity_client_flutter/main_callbacks.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/stores/server_store.dart';
 import 'package:syrenity_client_flutter/theme.dart';
+import 'package:syrenity_client_flutter/widgets/context_menu.dart';
+import 'package:syrenity_client_flutter/widgets/context_menus/channel_cm.dart';
+import 'package:syrenity_client_flutter/widgets/context_menus/server_cm.dart';
 import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 class ChannelBar extends StatefulWidget {
@@ -56,13 +59,18 @@ class _ChannelBarState extends State<ChannelBar> {
 
     return Column(
       children: [
-        Container(
-          height: SyrenityTheme.topBarHeight,
-          color: colors.surfaceContainer,
-          // color: colors.inversePrimary,
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(server?.name ?? "Loading..."),
+        ContextMenu(
+          items:
+              () =>
+                  server == null ? [] : makeServerContextMenu(context, server),
+          child: Container(
+            height: SyrenityTheme.topBarHeight,
+            color: colors.surfaceContainer,
+            // color: colors.inversePrimary,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(server?.name ?? "Loading..."),
+            ),
           ),
         ),
         Expanded(
@@ -74,21 +82,26 @@ class _ChannelBarState extends State<ChannelBar> {
                 final c = channels[i];
                 final selected = currentSettings.channelId == c.id;
 
-                return ListTile(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                  title: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [const Icon(Icons.tag), Text(c.name)],
+                return ContextMenu(
+                  items: () => makeChannelContextMenu(context, c),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                    title: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [const Icon(Icons.tag), Text(c.name)],
+                    ),
+                    tileColor:
+                        selected
+                            ? colors.primary.withValues(alpha: 0.24)
+                            : null,
+                    hoverColor: colors.primary.withValues(alpha: 0.08),
+                    onTap: () {
+                      if (MainCallbacks.setDrawerVisibility != null) {
+                        MainCallbacks.setDrawerVisibility!(false);
+                      }
+                      context.read<CurrentSettingsState>().setChannel(c.id);
+                    },
                   ),
-                  tileColor:
-                      selected ? colors.primary.withValues(alpha: 0.24) : null,
-                  hoverColor: colors.primary.withValues(alpha: 0.08),
-                  onTap: () {
-                    if (MainCallbacks.setDrawerVisibility != null) {
-                      MainCallbacks.setDrawerVisibility!(false);
-                    }
-                    context.read<CurrentSettingsState>().setChannel(c.id);
-                  },
                 );
               },
             ),

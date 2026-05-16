@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:syrenity_client_flutter/main_callbacks.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/stores/server_store.dart';
 import 'package:syrenity_client_flutter/stores/user_store.dart';
-import 'package:syrenity_client_flutter/theme.dart';
 import 'package:syrenity_client_flutter/widgets/avatar_with_status.dart';
 import 'package:syrenity_client_flutter/widgets/inline_username.dart';
 import 'package:syrenity_client_flutter/widgets/modals/user_viewer.dart';
@@ -24,8 +22,6 @@ class _MemberBarState extends State<MemberBar> {
 
   void load(SyServer server) async {
     final loadedMembers = await server.members.fetchAll();
-
-    print(loadedMembers.map((x) => x.status?.visibility));
 
     loadedMembers.sort((a, b) {
       final aHidden =
@@ -70,75 +66,38 @@ class _MemberBarState extends State<MemberBar> {
       });
     }
 
-    return Column(
-      children: [
-        Container(
-          height: SyrenityTheme.topBarHeight,
-          color: colors.surfaceContainer,
-          child: Stack(
-            children: [
-              // Centered title (true center)
-              const Center(child: Text("Members")),
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: Material(
+              color: colors.primaryContainer,
+              child: ListView.builder(
+                itemCount: members.length,
+                itemBuilder: (context, i) {
+                  final member = members[i];
+                  final user = users[member.userId];
 
-              // Left icon
-              Align(
-                alignment: Alignment.centerRight,
-                child:
-                    !currentSettings.memberBarShown
-                        ? IconButton(
-                          icon: Icon(Icons.group),
-                          onPressed: () {
-                            if (MainCallbacks.setMemberBarVisibility != null) {
-                              MainCallbacks.setMemberBarVisibility!(null);
-                            }
-                          },
-                        )
-                        : SizedBox.shrink(),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: Material(
-                  color: colors.primaryContainer,
-                  child: ListView.builder(
-                    itemCount: members.length,
-                    itemBuilder: (context, i) {
-                      final member = members[i];
-                      final user = users[member.userId];
+                  if (user == null) {
+                    return SizedBox();
+                  }
 
-                      if (user == null) {
-                        return SizedBox();
-                      }
-
-                      return ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                        ),
-                        leading: AvatarWithStatus(userId: user.id, size: 16),
-                        title: InlineUsername(user: user.id, bold: false),
-                        hoverColor: colors.primary.withValues(alpha: 0.08),
-                        onTap: () {
-                          showSyDialog(context, UserViewerModal(user: user));
-                        },
-                      );
+                  return ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                    leading: AvatarWithStatus(userId: user.id, size: 16),
+                    title: InlineUsername(user: user.id, bold: false),
+                    hoverColor: colors.primary.withValues(alpha: 0.08),
+                    onTap: () {
+                      showSyDialog(context, UserViewerModal(user: user));
                     },
-                  ),
-                ),
+                  );
+                },
               ),
-              Container(
-                height: SyrenityTheme.bottomBarHeight,
-                color: colors.inversePrimary,
-                // child: const Text("Test"),
-              ),
-            ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

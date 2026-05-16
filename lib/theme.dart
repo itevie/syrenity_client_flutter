@@ -7,4 +7,6 @@ class SyrenityTheme {
 
   static final double messageSpacing = 16;
   static final double messageAvatarSize = 24;
+
+  static final double mobileSize = 600;
 }

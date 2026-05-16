@@ -3,7 +3,7 @@ import 'package:syrenity_client_flutter/shared_prefs.dart';
 import 'package:syrenity_client_flutter/stores/util.dart';
 import 'package:syrenity_client_flutter/widgets/context_menu.dart';
 import 'package:syrenity_client_flutter/widgets/copy_something.dart';
-import 'package:syrenity_client_flutter/widgets/pages/settings/setting_parts.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/main_setting_parts.dart';
 import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 List<ContextMenuItem> makeServerUserAvatar(

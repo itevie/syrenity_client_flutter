@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/shared_prefs.dart';
 import 'package:syrenity_client_flutter/theme.dart';
@@ -7,17 +8,24 @@ import 'package:syrenity_client_flutter/widgets/context_menu.dart';
 import 'package:syrenity_client_flutter/widgets/context_menus/message_cm.dart';
 import 'package:syrenity_client_flutter/widgets/context_menus/server_user_avatar.dart';
 import 'package:syrenity_client_flutter/widgets/inline_username.dart';
+import 'package:syrenity_client_flutter/widgets/message_image.dart';
 import 'package:syrenity_client_flutter/widgets/message_markdown.dart';
 import 'package:syrenity_client_flutter/widgets/modals/user_viewer.dart';
-import 'package:syrenity_client_flutter/widgets/pages/settings/setting_parts.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/main_setting_parts.dart';
 import 'package:syrenity_client_flutter/widgets/show_dialog.dart';
 import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 class MessageWidget extends StatefulWidget {
   final SyMessage message;
   final int? newestMessage;
+  final bool isSending;
 
-  const MessageWidget({super.key, required this.message, this.newestMessage});
+  const MessageWidget({
+    super.key,
+    required this.message,
+    this.newestMessage,
+    this.isSending = false,
+  });
 
   @override
   State<StatefulWidget> createState() => _MessageWidgetState();
@@ -34,6 +42,7 @@ class _MessageWidgetState extends State<MessageWidget> {
     final colors = Theme.of(context).colorScheme;
 
     final message = widget.message;
+    final markdown = message.parseMarkdown();
 
     return Material(
       color: Colors.transparent,
@@ -50,7 +59,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                     top: SyrenityTheme.messageSpacing / 2,
                   ),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ContextMenu(
                 items:
@@ -72,7 +81,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                     backgroundImage: NetworkImage(
                       client.fileBase.from(
                         message.author.avatar ?? client.fileBase.badUrl,
-                      )!,
+                      ),
                     ),
                   ),
                 ),
@@ -100,7 +109,28 @@ class _MessageWidgetState extends State<MessageWidget> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      InlineUsername(user: message.authorId),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          InlineUsername(user: message.authorId),
+
+                          const SizedBox(width: 4),
+                          Text(
+                            formatMessageDate(message.createdAt),
+                            style: TextStyle(color: Colors.grey),
+                          ),
+
+                          // if (widget.isSending) ...[
+                          //   const SizedBox(width: 4),
+
+                          //   const Text(
+                          //     "Sending...",
+                          //     style: TextStyle(color: Colors.grey),
+                          //   ),
+                          //   const Icon(Icons.schedule, color: Colors.grey),
+                          // ],
+                        ],
+                      ),
                       const SizedBox(height: 4),
                       if (editing)
                         Column(
@@ -161,9 +191,48 @@ class _MessageWidgetState extends State<MessageWidget> {
                       else if (SettingsStorage.instance.getSetting<bool>(
                         SettingKeys.parseMarkdownInMessages,
                       ))
-                        MessageMarkdown(parsed: message.parseMarkdown())
+                        MessageMarkdown(
+                          parsed: markdown,
+                          isSending: widget.isSending,
+                        )
                       else
-                        Text(message.content),
+                        Text(
+                          message.content,
+                          style:
+                              widget.isSending
+                                  ? TextStyle(color: Colors.grey)
+                                  : null,
+                        ),
+                      if (markdown.objects.isNotEmpty) ...[
+                        Padding(
+                          padding: EdgeInsetsGeometry.all(8),
+                          child: Wrap(
+                            children: [
+                              ...markdown.objects
+                                  .whereType<LinkObjectType>()
+                                  .toList()
+                                  .asMap()
+                                  .entries
+                                  .map((entry) {
+                                    final index = entry.key;
+                                    final x = entry.value;
+
+                                    return MessageImage(
+                                      key: ValueKey(
+                                        "${message.id}-${x.url}-$index",
+                                      ),
+                                      url: x.url,
+                                      allImages:
+                                          markdown.objects
+                                              .whereType<LinkObjectType>()
+                                              .map((e) => e.url)
+                                              .toList(),
+                                    );
+                                  }),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -178,4 +247,19 @@ class _MessageWidgetState extends State<MessageWidget> {
 
 class _SendIntent extends Intent {
   const _SendIntent();
+}
+
+String formatMessageDate(DateTime date) {
+  final now = DateTime.now();
+
+  final isToday =
+      now.year == date.year && now.month == date.month && now.day == date.day;
+
+  if (isToday) {
+    // Only time
+    return DateFormat('HH:mm').format(date);
+  }
+
+  // Full date + time
+  return DateFormat('dd/MM/yyyy HH:mm').format(date);
 }

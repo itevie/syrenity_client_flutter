@@ -5,6 +5,8 @@ import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/stores/user_store.dart';
 import 'package:syrenity_client_flutter/theme.dart';
 import 'package:syrenity_client_flutter/widgets/avatar_with_status.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/main.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/setting_sections.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/settings.dart';
 
 class SelfSection extends StatefulWidget {
@@ -70,7 +72,20 @@ class _SelfSectionState extends State<SelfSection> {
           Spacer(),
           IconButton(
             onPressed: () {
-              navigate(context, SettingsPage());
+              navigate(
+                context,
+                SettingsPage(
+                  sections: <SettingSection>[
+                    SettingSections.user(context),
+                    SettingSections.interface(context),
+                    SettingSections.chat(context),
+                    SettingSections.developer(context),
+                    SettingSections.bots(context),
+                    SettingSections.about(context),
+                    SettingSections.logout(context),
+                  ],
+                ),
+              );
             },
             icon: const Icon(Icons.settings),
           ),

@@ -127,6 +127,8 @@ class _ServerBarWidget extends State<ServerBar> {
                                 MainCallbacks.setPage!(null);
                               }
 
+                              server.members.fetchAll();
+
                               context.read<CurrentSettingsState>().setServer(
                                 server.id,
                               );
@@ -145,14 +147,8 @@ class _ServerBarWidget extends State<ServerBar> {
                                   key: Key(server.id.toString()),
                                   radius: 25,
                                   backgroundColor: colors.secondaryContainer,
-                                  backgroundImage:
-                                      avatar != null
-                                          ? NetworkImage(avatar)
-                                          : null,
-                                  child:
-                                      avatar == null
-                                          ? Text(server.id.toString())
-                                          : null,
+                                  backgroundImage: NetworkImage(avatar),
+                                  child: null,
                                 ),
                               ),
                             ),

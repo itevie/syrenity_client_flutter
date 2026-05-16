@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syrenity_client_flutter/shared_prefs.dart';
 import 'package:syrenity_client_flutter/widgets/context_menu.dart';
-import 'package:syrenity_client_flutter/widgets/pages/settings/setting_parts.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/main_setting_parts.dart';
 import 'package:syrenity_client_flutter/widgets/show_top_overlay.dart';
 
 void showCopyChip(BuildContext context, String value) {

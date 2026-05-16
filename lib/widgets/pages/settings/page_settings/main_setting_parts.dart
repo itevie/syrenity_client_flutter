@@ -34,6 +34,8 @@ enum SettingKeys {
 }
 
 class SettingParts {
+  SettingParts._();
+
   static final showSendMessageButton = ChecklistSettingPart(
     name: "Send Message Button",
     description: "Show a send message button in the chatbar.",

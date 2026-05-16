@@ -9,12 +9,22 @@ import 'package:syrenity_client_flutter/stores/member_store.dart';
 import 'package:syrenity_client_flutter/stores/server_store.dart';
 import 'package:syrenity_client_flutter/stores/user_store.dart';
 import 'package:syrenity_client_flutter/widgets/pages/app_loading.dart';
-import 'package:syrenity_client_flutter/widgets/pages/chat_page.dart';
+import 'package:syrenity_client_flutter/widgets/pages/shell/chat_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SettingsStorage.instance.init();
   await setupClient();
+
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+
+    debugPrint("EXCEPTION:");
+    debugPrint(details.exceptionAsString());
+
+    debugPrint("STACK TRACE:");
+    debugPrint(details.stack.toString());
+  };
 
   runApp(
     MultiProvider(

@@ -48,7 +48,7 @@ class _AvatarWithStatusState extends State<AvatarWithStatus> {
         CircleAvatar(
           key: Key(user.id.toString()),
           radius: widget.size,
-          backgroundImage: avatar != null ? NetworkImage(avatar) : null,
+          backgroundImage: NetworkImage(avatar),
         ),
 
         Positioned(

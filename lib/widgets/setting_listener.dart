@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syrenity_client_flutter/shared_prefs.dart';
-import 'package:syrenity_client_flutter/widgets/pages/settings/setting_parts.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/main_setting_parts.dart';
 
 class SettingListener extends StatelessWidget {
   final SettingKeys setting;

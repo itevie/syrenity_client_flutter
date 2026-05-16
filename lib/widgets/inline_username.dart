@@ -20,35 +20,30 @@ class InlineUsername extends StatelessWidget {
     final userA = userStore[user]!;
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Flexible(
-          child: Text(
-            userA.username,
-            style: bold ? const TextStyle(fontWeight: FontWeight.bold) : null,
-            overflow: TextOverflow.ellipsis,
-          ),
+        Text(
+          userA.username,
+          style: bold ? const TextStyle(fontWeight: FontWeight.bold) : null,
+          overflow: TextOverflow.ellipsis,
+          softWrap: false,
         ),
 
         if (userA.isBot) ...[
-          SizedBox(width: 4),
-          SizedBox(
-            height: 20,
-            child: Container(
-              decoration: BoxDecoration(
-                color: colors.primary,
-                borderRadius: BorderRadius.circular(8),
-              ),
+          const SizedBox(width: 4),
 
-              child: Padding(
-                padding: EdgeInsets.only(left: 5, right: 5, top: 2, bottom: 2),
-                child: Center(
-                  child: Text(
-                    "Bot",
-                    style: TextStyle(color: colors.onPrimary, fontSize: 12),
-                  ),
-                ),
-              ),
+          Container(
+            height: 20,
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+            decoration: BoxDecoration(
+              color: colors.primary,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              "Bot",
+              style: TextStyle(color: colors.onPrimary, fontSize: 12),
             ),
           ),
         ],

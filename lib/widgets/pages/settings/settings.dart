@@ -3,7 +3,14 @@ import 'package:syrenity_client_flutter/widgets/pages/settings/setting_sections.
 import 'package:syrenity_client_flutter/widgets/pages/settings/settings_part_renderer.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+  final List<SettingSection> sections;
+  final String name;
+
+  const SettingsPage({
+    super.key,
+    required this.sections,
+    this.name = "Settings",
+  });
 
   @override
   State<StatefulWidget> createState() => _SettingsPageState();
@@ -11,26 +18,6 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   int selectedSection = 0;
-  List<SettingSection> sections = [];
-
-  List<SettingSection> getSections() {
-    return <SettingSection>[
-      SettingSections.user(context),
-      SettingSections.interface(context),
-      SettingSections.chat(context),
-      SettingSections.developer(context),
-      SettingSections.about(context),
-      SettingSections.logout(context),
-    ];
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    setState(() {
-      sections = getSections();
-    });
-  }
 
   Widget buildSidebar(bool isDesktop) {
     final colors = Theme.of(context).colorScheme;
@@ -40,15 +27,15 @@ class _SettingsPageState extends State<SettingsPage> {
       child: SizedBox(
         width: 220,
         child: ListView.builder(
-          itemCount: sections.length,
+          itemCount: widget.sections.length,
           itemBuilder: (context, index) {
             final selected = index == selectedSection;
 
             return ListTile(
-              title: Text(sections[index].name),
+              title: Text(widget.sections[index].name),
               selected: selected,
               onTap: () async {
-                switch (sections[index]) {
+                switch (widget.sections[index]) {
                   case CallbackSettingSecttion(:final callback):
                     callback();
                     return;
@@ -72,7 +59,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget buildContent() {
-    switch (sections[selectedSection]) {
+    switch (widget.sections[selectedSection]) {
       case WidgetSettingsSection(:final widget):
         return Padding(padding: EdgeInsets.all(10), child: widget());
       case PartsSettingSection(:final parts):
@@ -84,7 +71,7 @@ class _SettingsPageState extends State<SettingsPage> {
     }
 
     return Center(
-      child: Text("${sections[selectedSection].name}: Cannot handle"),
+      child: Text("${widget.sections[selectedSection].name}: Cannot handle"),
     );
   }
 
@@ -94,7 +81,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Settings"),
+        title: Text(widget.name),
         actions:
             isDesktop
                 ? []

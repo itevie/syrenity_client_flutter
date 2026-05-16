@@ -1,9 +1,14 @@
+import 'dart:math';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:syrenity_client_flutter/app_client.dart';
 import 'package:syrenity_client_flutter/stores/channel_store.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:flutter/services.dart';
-import 'package:syrenity_client_flutter/widgets/pages/settings/setting_parts.dart';
+import 'package:syrenity_client_flutter/widgets/pages/main/main_right.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/main_setting_parts.dart';
 import 'package:syrenity_client_flutter/widgets/setting_listener.dart';
 import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
@@ -11,7 +16,15 @@ final Map<int, String> channelDrafts = {};
 
 class MessageBar extends StatefulWidget {
   final SyChannel? channel;
-  const MessageBar({super.key, required this.channel});
+  final Function(int, FakeMessage) addFakeMessage;
+  final Function(int) removeFakeMessage;
+
+  const MessageBar({
+    super.key,
+    required this.channel,
+    required this.addFakeMessage,
+    required this.removeFakeMessage,
+  });
 
   @override
   State<StatefulWidget> createState() => _MessageBarState();
@@ -21,11 +34,18 @@ class _MessageBarState extends State<MessageBar> {
   final TextEditingController controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     final text = controller.text.trim();
     if (text.isEmpty || widget.channel == null) return;
 
-    widget.channel?.send(text);
+    final random = Random();
+
+    final value = -random.nextInt(1 << 31) - 1;
+    widget.addFakeMessage(value, FakeMessage(content: text));
+
+    await widget.channel?.send(text);
+
+    widget.removeFakeMessage(value);
 
     controller.clear();
     channelDrafts.remove(widget.channel!.id);
@@ -103,7 +123,23 @@ class _MessageBarState extends State<MessageBar> {
         ),
         child: Row(
           children: [
-            IconButton(icon: const Icon(Icons.add), onPressed: () {}),
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () async {
+                FilePickerResult? result = await FilePicker.pickFiles();
+
+                if (result != null) {
+                  PlatformFile file = result.files.first;
+
+                  final returnedFile = await client.files.upload(file);
+
+                  controller.text +=
+                      returnedFile.url ?? "<f:${returnedFile.id}>";
+                } else {
+                  print("User cancelled");
+                }
+              },
+            ),
 
             Expanded(
               child: Shortcuts(
