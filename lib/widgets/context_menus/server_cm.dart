@@ -67,7 +67,13 @@ List<ContextMenuItem> makeServerContextMenu(
           context,
           SettingsPage(
             name: "${server.name} Settings",
-            sections: [ServerSettingsParts.about(context)],
+            sections: [
+              ServerSettingsParts.about(context),
+              ServerSettingsParts.members(context),
+              ServerSettingsParts.roles(context),
+              ServerSettingsParts.invites(context),
+              ServerSettingsParts.details(context),
+            ],
           ),
         );
       },

@@ -10,10 +10,10 @@ class ChannelMessagesController extends ChangeNotifier {
   final bool showPinned;
 
   List<SyMessage> messages = [];
+  List<SyTodoItem> todos = [];
 
   bool isLoadingMore = false;
   bool initialLoading = true;
-
   int _loadToken = 0;
 
   late void Function(SyMessage) _messageCreateCallback;
@@ -31,21 +31,25 @@ class ChannelMessagesController extends ChangeNotifier {
 
     if (noEvents) return;
 
-    _messageCreateCallback = (message) {
-      if (message.channelId != channelId) return;
+    final channel = channelStore[channelId];
 
-      messages.insert(0, message);
-      notifyListeners();
-    };
+    if (channel!.isTextChannel()) {
+      _messageCreateCallback = (message) {
+        if (message.channelId != channelId) return;
 
-    _messageDeleteCallback = (messageId) {
-      messages.removeWhere((x) => x.id == messageId);
-      notifyListeners();
-    };
+        messages.insert(0, message);
+        notifyListeners();
+      };
 
-    client.events.on(SyEvents.dispatchCreateMessage, _messageCreateCallback);
+      _messageDeleteCallback = (messageId) {
+        messages.removeWhere((x) => x.id == messageId);
+        notifyListeners();
+      };
 
-    client.events.on(SyEvents.dispatchDeleteMessage, _messageDeleteCallback);
+      client.events.on(SyEvents.dispatchCreateMessage, _messageCreateCallback);
+
+      client.events.on(SyEvents.dispatchDeleteMessage, _messageDeleteCallback);
+    } else if (channel.isTodoChannel()) {}
   }
 
   Future<void> load(int token) async {
@@ -61,7 +65,7 @@ class ChannelMessagesController extends ChangeNotifier {
     }
 
     try {
-      final fetchedMessages = await channel.query(
+      final fetchedMessages = await channel.asTextChannel().query(
         ChannelMessageQueryOptions(amount: 20, isPinned: showPinned),
       );
 
@@ -75,7 +79,8 @@ class ChannelMessagesController extends ChangeNotifier {
       if (fetchedMessages.isNotEmpty) {
         await channel.lastMessageAck?.updateAck(fetchedMessages.first.id);
       }
-    } catch (_) {
+    } catch (e) {
+      print(e);
       if (token != _loadToken) return;
 
       messages = [];
@@ -101,7 +106,7 @@ class ChannelMessagesController extends ChangeNotifier {
           .map((m) => m.id)
           .reduce((a, b) => a < b ? a : b);
 
-      final fetched = await channel.query(
+      final fetched = await channel.asTextChannel().query(
         ChannelMessageQueryOptions(
           amount: 20,
           startAt: oldestMessageId,

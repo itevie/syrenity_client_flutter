@@ -37,8 +37,8 @@ Future<void> setupClient({bool login = true}) async {
     channelStore.set(channel);
   });
 
-  client.events.on(SyEvents.channelUpdateMessageAck, (ack) {
-    channelStore.set(ack.channel);
+  client.events.on(SyEvents.channelUpdateMessageAck, (channel) {
+    channelStore.set(channel);
   });
 
   client.events.on(SyEvents.createServer, (server) {

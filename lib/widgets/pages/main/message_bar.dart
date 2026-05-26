@@ -43,7 +43,7 @@ class _MessageBarState extends State<MessageBar> {
     final value = -random.nextInt(1 << 31) - 1;
     widget.addFakeMessage(value, FakeMessage(content: text));
 
-    await widget.channel?.send(text);
+    await widget.channel?.asTextChannel().send(text);
 
     widget.removeFakeMessage(value);
 
@@ -161,7 +161,7 @@ class _MessageBarState extends State<MessageBar> {
                     minLines: 1,
                     maxLines: 5,
                     onChanged: (_) {
-                      channel?.startTyping();
+                      channel?.asTextChannel().startTyping();
                     },
                     decoration: InputDecoration(
                       hintText: "Message #${channel?.name ?? "Loading..."}",

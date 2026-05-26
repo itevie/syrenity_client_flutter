@@ -88,7 +88,12 @@ class _ChannelBarState extends State<ChannelBar> {
                     contentPadding: EdgeInsets.symmetric(horizontal: 8),
                     title: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [const Icon(Icons.tag), Text(c.name)],
+                      children: [
+                        c.type == SyChannelType.todo
+                            ? const Icon(Icons.task)
+                            : const Icon(Icons.tag),
+                        Text(c.name),
+                      ],
                     ),
                     tileColor:
                         selected
