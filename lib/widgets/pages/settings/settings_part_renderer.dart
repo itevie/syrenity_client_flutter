@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/setting_part_def.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/settings_widgets/page_switch_part.dart';
 
 class SettingsPartRenderer extends StatefulWidget {
   final List<SettingPart> parts;
@@ -49,37 +50,10 @@ class _SettingsPartRendererState extends State<SettingsPartRenderer> {
                 const Expanded(child: Divider()),
               ],
             ),
-            PageSwitchSettingPart() => Card(
-              margin: const EdgeInsets.symmetric(vertical: 4),
-              child: InkWell(
-                onTap: part.onTap,
-                borderRadius: BorderRadius.circular(
-                  12,
-                ), // optional, matches Card
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              part.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(part.description),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      const Icon(Icons.chevron_right),
-                    ],
-                  ),
-                ),
-              ),
+            PageSwitchSettingPart() => pageSwitchPart(
+              part.name,
+              part.description,
+              part.onTap,
             ),
           };
         }),

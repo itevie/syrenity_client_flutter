@@ -16,8 +16,47 @@ class SettingsPage extends StatefulWidget {
   State<StatefulWidget> createState() => _SettingsPageState();
 }
 
+class PageOptions {
+  Widget? page;
+  (VoidCallback, IconData)? fab;
+
+  PageOptions({this.page, this.fab});
+}
+
+void Function(Widget page)? changeSettingsPagesPage;
+void Function(PageOptions updatePage)? updateSettingsPagesPage;
+
 class _SettingsPageState extends State<SettingsPage> {
   int selectedSection = 0;
+
+  PageOptions? overridePage;
+
+  @override
+  void initState() {
+    super.initState();
+
+    changeSettingsPagesPage = (page) {
+      setState(() {
+        overridePage = PageOptions(page: page);
+      });
+    };
+
+    updateSettingsPagesPage = (updatePage) {
+      setState(() {
+        overridePage = PageOptions(
+          page: updatePage.page ?? overridePage?.page,
+          fab: updatePage.fab ?? overridePage?.fab,
+        );
+      });
+    };
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    changeSettingsPagesPage = null;
+    updateSettingsPagesPage = null;
+  }
 
   Widget buildSidebar(bool isDesktop) {
     final colors = Theme.of(context).colorScheme;
@@ -33,6 +72,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
             return ListTile(
               title: Text(widget.sections[index].name),
+              leading:
+                  widget.sections[index].icon != null
+                      ? Icon(widget.sections[index].icon)
+                      : null,
               selected: selected,
               onTap: () async {
                 switch (widget.sections[index]) {
@@ -43,6 +86,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 }
 
                 setState(() {
+                  overridePage = null;
                   selectedSection = index;
                 });
 
@@ -59,6 +103,10 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget buildContent() {
+    if (overridePage != null) {
+      return Padding(padding: EdgeInsets.all(10), child: overridePage!.page);
+    }
+
     switch (widget.sections[selectedSection]) {
       case WidgetSettingsSection(:final widget):
         return Padding(padding: EdgeInsets.all(10), child: widget());
@@ -75,6 +123,20 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  Widget? buildFab() {
+    var data = overridePage?.fab;
+
+    if (widget.sections[selectedSection] is WidgetSettingsSection &&
+        (widget.sections[selectedSection] as WidgetSettingsSection).fab !=
+            null) {
+      data = (widget.sections[selectedSection] as WidgetSettingsSection).fab;
+    }
+
+    return data != null
+        ? FloatingActionButton(onPressed: data.$1, child: Icon(data.$2))
+        : null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDesktop = MediaQuery.of(context).size.width >= 600;
@@ -88,12 +150,19 @@ class _SettingsPageState extends State<SettingsPage> {
                 : [
                   IconButton(
                     onPressed: () {
+                      if (overridePage != null) {
+                        setState(() {
+                          overridePage = null;
+                        });
+                        return;
+                      }
                       Navigator.of(context).pop();
                     },
                     icon: const Icon(Icons.close),
                   ),
                 ],
       ),
+      floatingActionButton: buildFab(),
       drawer: isDesktop ? null : Drawer(child: buildSidebar(isDesktop)),
       body:
           isDesktop

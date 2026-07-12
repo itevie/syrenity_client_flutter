@@ -198,7 +198,7 @@ class _MessageWidgetState extends State<MessageWidget> {
                       else if (SettingsStorage.instance.getSetting<bool>(
                         SettingKeys.parseMarkdownInMessages,
                       ))
-                        Row(
+                        Wrap(
                           children: [
                             MessageMarkdown(
                               parsed: markdown,
@@ -217,13 +217,28 @@ class _MessageWidgetState extends State<MessageWidget> {
                           ],
                         )
                       else
-                        Text(
-                          message.content,
-                          style:
-                              widget.isSending
-                                  ? TextStyle(color: Colors.grey)
-                                  : null,
+                        Wrap(
+                          children: [
+                            Text(
+                              message.content,
+                              style:
+                                  widget.isSending
+                                      ? TextStyle(color: Colors.grey)
+                                      : null,
+                            ),
+                            if (widget.message.isEdited) ...[
+                              const SizedBox(width: 4),
+                              Text(
+                                "(edited)",
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
+
                       if (markdown.objects.isNotEmpty) ...[
                         Padding(
                           padding: EdgeInsetsGeometry.all(8),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/server/server_channel_order.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/server/server_channel_settings.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/server/server_invite_settings.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/server/server_member_settings.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/server/server_role_settings.dart';
@@ -13,7 +14,7 @@ class ServerSettingsParts {
       WidgetSettingsSection(
         name: "Server",
         context: context,
-        widget: () => ServerChannelOrderSettings(),
+        widget: () => AboutPage(),
       );
 
   static WidgetSettingsSection members(BuildContext context) =>
@@ -28,6 +29,14 @@ class ServerSettingsParts {
         context: context,
         name: "Roles",
         widget: () => ServerRoleSettings(),
+        fab: (() {}, Icons.add),
+      );
+
+  static WidgetSettingsSection channels(BuildContext context) =>
+      WidgetSettingsSection(
+        context: context,
+        name: "Channels",
+        widget: () => ServerChannelSettingsPage(),
       );
 
   static WidgetSettingsSection invites(BuildContext context) =>

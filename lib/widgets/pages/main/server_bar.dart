@@ -62,14 +62,6 @@ class _ServerBarWidget extends State<ServerBar> {
       memberRemoveCallback = null;
     }
 
-    if (channelOrderUpdateCallback != null) {
-      client.events.off(
-        SyEvents.dispatchChannelOrderUpdate,
-        channelOrderUpdateCallback!,
-      );
-      channelOrderUpdateCallback = null;
-    }
-
     super.dispose();
   }
 

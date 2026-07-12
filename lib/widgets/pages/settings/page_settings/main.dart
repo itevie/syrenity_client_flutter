@@ -13,21 +13,34 @@ import 'package:syrenity_client_flutter/widgets/pages/settings/setting_sections.
 class SettingSections {
   SettingSections._();
 
-  static user(context) => WidgetSettingsSection(
-    name: "User",
-    context: context,
-    widget: () => EditUserPage(),
-  );
+  static WidgetSettingsSection user(BuildContext context) =>
+      WidgetSettingsSection(
+        name: "User",
+        icon: Icons.person,
+        context: context,
+        widget: () => EditUserPage(),
+      );
 
-  static interface(context) => PartsSettingSection(
-    context: context,
-    name: "Interface",
-    parts: [SettingParts.showCopiedToClipboardFlout],
-  );
+  static PartsSettingSection interface(BuildContext context) =>
+      PartsSettingSection(
+        context: context,
+        name: "Interface",
+        icon: Icons.display_settings,
+        parts: [SettingParts.showCopiedToClipboardFlout],
+      );
 
-  static chat(context) => PartsSettingSection(
+  static PartsSettingSection appearance(BuildContext context) =>
+      PartsSettingSection(
+        context: context,
+        icon: Icons.palette,
+        name: "Appearance",
+        parts: [SettingParts.darkMode],
+      );
+
+  static PartsSettingSection chat(BuildContext context) => PartsSettingSection(
     context: context,
     name: "Chat",
+    icon: Icons.chat,
     parts: [
       SeperatorSettingPart("Chatbar"),
       SettingParts.showSendMessageButton,
@@ -38,39 +51,47 @@ class SettingSections {
     ],
   );
 
-  static developer(context) => PartsSettingSection(
-    context: context,
-    name: "Developer",
-    parts: [SettingParts.developerMode, SettingParts.developerShowBots],
-  );
-
-  static bots(context) => WidgetSettingsSection(
-    context: context,
-    name: "Applications",
-    widget: () => UserApplicationsPage(),
-  );
-
-  static about(context) => WidgetSettingsSection(
-    name: "About",
-    context: context,
-    widget: () => AboutPage(),
-  );
-
-  static logout(context) => CallbackSettingSecttion(
-    context: context,
-    name: "Logout",
-    callback: () async {
-      final conf = await showConfirmPrompt(
-        context,
-        const Text("Logout"),
-        const Text("Are you sure you want to logout?"),
+  static PartsSettingSection developer(BuildContext context) =>
+      PartsSettingSection(
+        context: context,
+        name: "Developer",
+        icon: Icons.code,
+        parts: [SettingParts.developerMode, SettingParts.developerShowBots],
       );
 
-      if (conf) {
-        await SettingsStorage.instance.remove("token");
-        setupClient(login: false);
-        reload();
-      }
-    },
-  );
+  static WidgetSettingsSection bots(BuildContext context) =>
+      WidgetSettingsSection(
+        context: context,
+        name: "Applications",
+        icon: Icons.apps,
+        widget: () => UserApplicationsPage(),
+      );
+
+  static WidgetSettingsSection about(BuildContext context) =>
+      WidgetSettingsSection(
+        name: "About",
+        icon: Icons.info,
+        context: context,
+        widget: () => AboutPage(),
+      );
+
+  static CallbackSettingSecttion logout(BuildContext context) =>
+      CallbackSettingSecttion(
+        context: context,
+        name: "Logout",
+        icon: Icons.logout,
+        callback: () async {
+          final conf = await showConfirmPrompt(
+            context,
+            const Text("Logout"),
+            const Text("Are you sure you want to logout?"),
+          );
+
+          if (conf) {
+            await SettingsStorage.instance.remove("token");
+            setupClient(login: false);
+            reload();
+          }
+        },
+      );
 }

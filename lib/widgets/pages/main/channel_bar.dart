@@ -8,6 +8,7 @@ import 'package:syrenity_client_flutter/theme.dart';
 import 'package:syrenity_client_flutter/widgets/context_menu.dart';
 import 'package:syrenity_client_flutter/widgets/context_menus/channel_cm.dart';
 import 'package:syrenity_client_flutter/widgets/context_menus/server_cm.dart';
+import 'package:syrenity_client_flutter/widgets/pages/main/channel_types/components/channel_name.dart';
 import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 class ChannelBar extends StatefulWidget {
@@ -21,13 +22,14 @@ class _ChannelBarState extends State<ChannelBar> {
   List<SyChannel> channels = [];
   int? _lastServerId;
 
-  void Function()? channelOrderUpdateCallback;
+  void Function(SpecialDispatchChannelUpdateOrder)? channelOrderUpdateCallback;
 
   @override
   void initState() {
     super.initState();
 
-    channelOrderUpdateCallback = (channelIds) {
+    channelOrderUpdateCallback = (update) {
+      if (update.guildId == null || update.guildId != _lastServerId) return;
       load(_lastServerId!);
     };
 
@@ -35,6 +37,18 @@ class _ChannelBarState extends State<ChannelBar> {
       SyEvents.dispatchChannelOrderUpdate,
       channelOrderUpdateCallback!,
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (channelOrderUpdateCallback != null) {
+      client.events.off(
+        SyEvents.dispatchChannelOrderUpdate,
+        channelOrderUpdateCallback!,
+      );
+      channelOrderUpdateCallback = null;
+    }
   }
 
   void load(int serverId) async {
@@ -102,15 +116,7 @@ class _ChannelBarState extends State<ChannelBar> {
                   items: () => makeChannelContextMenu(context, c),
                   child: ListTile(
                     contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                    title: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        c.type == SyChannelType.todo
-                            ? const Icon(Icons.task)
-                            : const Icon(Icons.tag),
-                        Text(c.name),
-                      ],
-                    ),
+                    title: channelName(c),
                     tileColor:
                         selected
                             ? colors.primary.withValues(alpha: 0.24)

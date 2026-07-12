@@ -54,6 +54,7 @@ Future<List<ContextMenuItem>> makeServerContextMenu(
             name: "${server.name} Settings",
             sections: [
               ServerSettingsParts.about(context),
+              ServerSettingsParts.channels(context),
               ServerSettingsParts.members(context),
               ServerSettingsParts.roles(context),
               ServerSettingsParts.invites(context),

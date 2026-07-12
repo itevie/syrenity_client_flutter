@@ -13,14 +13,23 @@ class MessageMarkdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RichText(text: TextSpan(children: _build(parsed.tokens, isSending)));
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return RichText(
+      text: TextSpan(children: _build(parsed.tokens, isSending, isDark)),
+    );
   }
 }
 
-List<TextSpan> _build(List<ParserToken> tokens, bool isSending) {
+List<TextSpan> _build(List<ParserToken> tokens, bool isSending, bool darkMode) {
   final widgets = <TextSpan>[];
 
-  Color? color = isSending ? Colors.grey : null;
+  Color? color =
+      isSending
+          ? Colors.grey
+          : !darkMode
+          ? Colors.black
+          : null;
 
   for (final token in tokens) {
     switch (token) {
@@ -30,7 +39,7 @@ List<TextSpan> _build(List<ParserToken> tokens, bool isSending) {
       case ItalicParserToken(:final children):
         widgets.add(
           TextSpan(
-            children: _build(children, isSending),
+            children: _build(children, isSending, darkMode),
             style: TextStyle(fontStyle: FontStyle.italic, color: color),
           ),
         );
@@ -49,7 +58,7 @@ List<TextSpan> _build(List<ParserToken> tokens, bool isSending) {
       case UnderlineParserToken(:final children):
         widgets.add(
           TextSpan(
-            children: _build(children, isSending),
+            children: _build(children, isSending, darkMode),
             style: TextStyle(
               decoration: TextDecoration.underline,
               color: color,
@@ -60,7 +69,7 @@ List<TextSpan> _build(List<ParserToken> tokens, bool isSending) {
       case BoldParserToken(:final children):
         widgets.add(
           TextSpan(
-            children: _build(children, isSending),
+            children: _build(children, isSending, darkMode),
             style: TextStyle(fontWeight: FontWeight.bold, color: color),
           ),
         );
@@ -68,7 +77,7 @@ List<TextSpan> _build(List<ParserToken> tokens, bool isSending) {
       case TextParserTokenGroup(:final children):
         widgets.add(
           TextSpan(
-            children: _build(children, isSending),
+            children: _build(children, isSending, darkMode),
             style: TextStyle(color: color),
           ),
         );

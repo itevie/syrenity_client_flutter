@@ -25,7 +25,10 @@ enum SettingKeys {
     defaultValue: true,
   ),
 
-  developerMode(storageKey: "developer_mode", defaultValue: false);
+  developerMode(storageKey: "developer_mode", defaultValue: false),
+
+  darkMode(storageKey: "dark_mode", defaultValue: true),
+  themeColor(storageKey: "theme_color", defaultValue: false);
 
   final String storageKey;
   final bool defaultValue;
@@ -146,6 +149,24 @@ class SettingParts {
     callback: (value) {
       SettingsStorage.instance.set<bool>(
         SettingKeys.parseMarkdownInMessages.storageKey,
+        value,
+      );
+    },
+  );
+
+  static final darkMode = ChecklistSettingPart(
+    name: "Dark Mode",
+    description: "Enable dark mode for the application",
+    provideValue: () async {
+      return SettingsStorage.instance.get<bool>(
+            SettingKeys.darkMode.storageKey,
+          ) ??
+          SettingKeys.darkMode.defaultValue;
+    },
+    defaultValue: SettingKeys.darkMode.defaultValue,
+    callback: (value) {
+      SettingsStorage.instance.set<bool>(
+        SettingKeys.darkMode.storageKey,
         value,
       );
     },

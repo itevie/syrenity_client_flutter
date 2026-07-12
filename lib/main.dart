@@ -9,6 +9,7 @@ import 'package:syrenity_client_flutter/stores/member_store.dart';
 import 'package:syrenity_client_flutter/stores/server_store.dart';
 import 'package:syrenity_client_flutter/stores/user_store.dart';
 import 'package:syrenity_client_flutter/widgets/pages/app_loading.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/main_setting_parts.dart';
 import 'package:syrenity_client_flutter/widgets/pages/shell/chat_page.dart';
 
 void main() async {
@@ -62,27 +63,48 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Syrenity',
-      debugShowCheckedModeBanner: false,
+    final themeNotifier = SettingsStorage.instance.notifierFor<String?>(
+      SettingKeys.themeColor,
+    );
 
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
+    final darkModeNotifier = SettingsStorage.instance.notifierFor<bool>(
+      SettingKeys.darkMode,
+    );
 
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-          brightness: Brightness.dark,
-        ),
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF121212),
-      ),
+    return AnimatedBuilder(
+      animation: Listenable.merge([themeNotifier, darkModeNotifier]),
+      builder: (context, _) {
+        final userColor = themeNotifier.value;
+        final darkMode = darkModeNotifier.value;
 
-      home: Scaffold(
-        // appBar: AppBar(title: const Text("Syrenity")),
-        body: SafeArea(child: ChatPage()),
-      ),
+        final color =
+            userColor != null && userColor.length > 5
+                ? hexToColor(userColor)
+                : Colors.deepPurple;
+
+        return MaterialApp(
+          theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: color)),
+          darkTheme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: color,
+              brightness: Brightness.dark,
+            ),
+            brightness: Brightness.dark,
+          ),
+          themeMode: darkMode ? ThemeMode.dark : ThemeMode.light,
+          home: Scaffold(body: SafeArea(child: ChatPage())),
+        );
+      },
     );
   }
+}
+
+Color hexToColor(String hex) {
+  hex = hex.replaceAll('#', '');
+
+  if (hex.length == 6) {
+    hex = 'FF$hex'; // add alpha if missing
+  }
+
+  return Color(int.parse(hex, radix: 16));
 }

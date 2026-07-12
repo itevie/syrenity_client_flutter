@@ -2,10 +2,12 @@ import 'package:dawn_ui_flutter/dawn_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syrenity_client_flutter/app_client.dart';
+import 'package:syrenity_client_flutter/shared_prefs.dart';
 import 'package:syrenity_client_flutter/stores/user_store.dart';
 import 'package:syrenity_client_flutter/theme.dart';
 import 'package:syrenity_client_flutter/widgets/avatar_with_status.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/main.dart';
+import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/main_setting_parts.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/setting_sections.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/settings.dart';
 
@@ -64,6 +66,33 @@ class _SelfSectionState extends State<SelfSection> {
                       style: const TextStyle(fontSize: 12),
                       overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(width: 8),
+
+                    IconButton(
+                      onPressed: () async {
+                        final color = await showInputPrompt(
+                          context,
+                          Text("UI Colour:"),
+                          null,
+                        );
+                        SettingsStorage.instance.set<String?>(
+                          "theme_color",
+                          color,
+                        );
+                      },
+                      icon: const Icon(Icons.color_lens),
+                    ),
+
+                    IconButton(
+                      onPressed: () async {
+                        final old = SettingsStorage.instance.getSetting(
+                          SettingKeys.darkMode,
+                        );
+
+                        SettingsStorage.instance.set<bool>("dark_mode", !old);
+                      },
+                      icon: const Icon(Icons.sunny),
+                    ),
                   ],
                 ),
               ),
@@ -78,6 +107,7 @@ class _SelfSectionState extends State<SelfSection> {
                   sections: <SettingSection>[
                     SettingSections.user(context),
                     SettingSections.interface(context),
+                    SettingSections.appearance(context),
                     SettingSections.chat(context),
                     SettingSections.developer(context),
                     SettingSections.bots(context),

@@ -38,18 +38,22 @@ class SettingsStorage {
 
     bool result;
 
-    if (value is bool) {
-      result = await _prefs!.setBool(key, value);
-    } else if (value is int) {
-      result = await _prefs!.setInt(key, value);
-    } else if (value is double) {
-      result = await _prefs!.setDouble(key, value);
-    } else if (value is String) {
-      result = await _prefs!.setString(key, value);
-    } else if (value is List<String>) {
-      result = await _prefs!.setStringList(key, value);
+    if (value == null) {
+      result = await _prefs!.remove(key);
     } else {
-      throw Exception("Unsupported type: ${value.runtimeType}");
+      if (value is bool) {
+        result = await _prefs!.setBool(key, value);
+      } else if (value is int) {
+        result = await _prefs!.setInt(key, value);
+      } else if (value is double) {
+        result = await _prefs!.setDouble(key, value);
+      } else if (value is String) {
+        result = await _prefs!.setString(key, value);
+      } else if (value is List<String>) {
+        result = await _prefs!.setStringList(key, value);
+      } else {
+        throw Exception("Unsupported type: ${value.runtimeType}");
+      }
     }
 
     if (_notifiers.containsKey(key)) {
