@@ -4,6 +4,8 @@ import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/stores/server_store.dart';
 import 'package:syrenity_client_flutter/stores/user_store.dart';
 import 'package:syrenity_client_flutter/widgets/avatar_with_status.dart';
+import 'package:syrenity_client_flutter/widgets/context_menu.dart';
+import 'package:syrenity_client_flutter/widgets/context_menus/server_user_avatar.dart';
 import 'package:syrenity_client_flutter/widgets/inline_username.dart';
 import 'package:syrenity_client_flutter/widgets/modals/user_viewer.dart';
 import 'package:syrenity_client_flutter/widgets/show_dialog.dart';
@@ -83,14 +85,22 @@ class _MemberBarState extends State<MemberBar> {
                     return SizedBox();
                   }
 
-                  return ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                    leading: AvatarWithStatus(userId: user.id, size: 16),
-                    title: InlineUsername(user: user.id, bold: false),
-                    hoverColor: colors.primary.withValues(alpha: 0.08),
-                    onTap: () {
-                      showSyDialog(context, UserViewerModal(user: user));
-                    },
+                  return ContextMenu(
+                    items:
+                        () => makeServerUserAvatar(
+                          context,
+                          currentSettings.channelId!,
+                          user,
+                        ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                      leading: AvatarWithStatus(userId: user.id, size: 16),
+                      title: InlineUsername(user: user.id, bold: false),
+                      hoverColor: colors.primary.withValues(alpha: 0.08),
+                      onTap: () {
+                        showSyDialog(context, UserViewerModal(user: user));
+                      },
+                    ),
                   );
                 },
               ),

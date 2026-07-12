@@ -42,7 +42,7 @@ class _TypingIdicatorState extends State<TypingIndicator> {
         typing = typing.where((x) => x.$1 != message.author.id).toList();
       });
     };
-    client.events.on(SyEvents.dispatchCreateMessage, messageCallback!);
+    client.events.on(SyEvents.dispatchMessageCreate, messageCallback!);
 
     _timer = Timer.periodic(const Duration(seconds: 3), (_) {
       if (!mounted) return;
@@ -71,7 +71,7 @@ class _TypingIdicatorState extends State<TypingIndicator> {
     }
 
     if (messageCallback != null) {
-      client.events.off(SyEvents.dispatchCreateMessage, messageCallback!);
+      client.events.off(SyEvents.dispatchMessageCreate, messageCallback!);
       messageCallback = null;
     }
 

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/stores/server_store.dart';
 import 'package:syrenity_client_flutter/widgets/table.dart';
+import 'package:syrenity_client_flutter/widgets/todo.dart';
 import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -52,8 +53,10 @@ class _ServerInviteSettingsState extends State<ServerInviteSettings> {
                 ),
               ),
               ElevatedButton.icon(
-                onPressed: () {},
-                label: const Text("Add Role"),
+                onPressed: () {
+                  todo(context);
+                },
+                label: const Text("Create Invite (TODO!)"),
                 icon: const Icon(Icons.add_rounded),
               ),
             ],
@@ -89,7 +92,9 @@ class _ServerInviteSettingsState extends State<ServerInviteSettings> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: IconButton.filled(
-                        onPressed: () {},
+                        onPressed: () {
+                          todo(context);
+                        },
                         icon: const Icon(Icons.delete, size: 18),
                       ),
                     ),

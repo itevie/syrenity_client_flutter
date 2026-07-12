@@ -25,6 +25,7 @@ class _ChatPageState extends State<ChatPage> {
 
     MainCallbacks.setDrawerVisibility = (value) {
       setState(() {
+        if ((value ?? !leftPanelOpen == true)) sidebarWidget = null;
         leftPanelOpen = value ?? !leftPanelOpen;
       });
     };
@@ -57,6 +58,7 @@ class _ChatPageState extends State<ChatPage> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth >= SyrenityTheme.mobileSize;
+
         final colors = Theme.of(context).colorScheme;
 
         final sidebar =

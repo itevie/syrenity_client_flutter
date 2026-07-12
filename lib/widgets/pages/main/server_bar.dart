@@ -62,6 +62,14 @@ class _ServerBarWidget extends State<ServerBar> {
       memberRemoveCallback = null;
     }
 
+    if (channelOrderUpdateCallback != null) {
+      client.events.off(
+        SyEvents.dispatchChannelOrderUpdate,
+        channelOrderUpdateCallback!,
+      );
+      channelOrderUpdateCallback = null;
+    }
+
     super.dispose();
   }
 
@@ -111,7 +119,8 @@ class _ServerBarWidget extends State<ServerBar> {
                   final avatar = client.fileBase.from(server.avatar);
 
                   return ContextMenu(
-                    items: () => makeServerContextMenu(context, server),
+                    asyncItems:
+                        () async => makeServerContextMenu(context, server),
 
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 6),

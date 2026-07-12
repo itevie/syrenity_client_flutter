@@ -4,6 +4,7 @@ import 'package:syrenity_client_flutter/stores/channel_store.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/theme.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/channel_bar.dart';
+import 'package:syrenity_client_flutter/widgets/pages/main/channel_types/all_channels.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/main_right.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/self_section.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/server_bar.dart';
@@ -41,7 +42,10 @@ class MobileChatShell extends StatelessWidget {
           Positioned.fill(
             child:
                 currentPage == null
-                    ? MainRight(channelId: channel?.id)
+                    ? AllChannels(
+                      channelId: channel?.id,
+                      key: Key("main-${channel?.id}"),
+                    )
                     : currentPage!,
           ),
 
@@ -86,14 +90,15 @@ class MobileChatShell extends StatelessWidget {
             ),
           ),
 
-          if (sidebarWidget != null)
-            Positioned(
-              right: 0,
-              top: 0,
-              bottom: 0,
-              width: MediaQuery.of(context).size.width * 0.85,
-              child: Material(child: sidebarWidget),
-            ),
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.fastEaseInToSlowEaseOut,
+            right: (sidebarWidget == null || leftPanelOpen) ? -320 : 0,
+            top: 0,
+            bottom: 0,
+            width: 320,
+            child: sidebarWidget ?? SizedBox(),
+          ),
         ],
       ),
     );

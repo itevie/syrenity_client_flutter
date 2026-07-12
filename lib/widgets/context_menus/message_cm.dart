@@ -4,6 +4,7 @@ import 'package:syrenity_client_flutter/stores/util.dart';
 import 'package:syrenity_client_flutter/widgets/context_menu.dart';
 import 'package:syrenity_client_flutter/widgets/copy_something.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/main_setting_parts.dart';
+import 'package:syrenity_client_flutter/widgets/todo.dart';
 import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 List<ContextMenuItem> makeMessageContextMenu(
@@ -26,13 +27,6 @@ List<ContextMenuItem> makeMessageContextMenu(
       details.$2.ownerId == user.id
           ? true
           : details.$1.hasPermission(SyPermission.manageMessages);
-
-  print({
-    'owner': details.$2.ownerId,
-    'current': user.id,
-    'permissions': details.$1.permissions,
-    'result': canManageMessage,
-  });
 
   final canDelete = user.id == message.authorId || canManageMessage;
 
@@ -64,6 +58,14 @@ List<ContextMenuItem> makeMessageContextMenu(
           } else {
             await message.pin();
           }
+        },
+      ),
+    if (canManageMessage && message.embeds.isNotEmpty)
+      ContextMenuButton(
+        label: "Remove Embeds (TODO!)",
+        icon: Icons.link_off,
+        onPressed: () {
+          todo(context);
         },
       ),
     ContextMenuSeparator(),

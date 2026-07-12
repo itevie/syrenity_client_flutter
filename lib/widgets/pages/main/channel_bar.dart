@@ -21,6 +21,22 @@ class _ChannelBarState extends State<ChannelBar> {
   List<SyChannel> channels = [];
   int? _lastServerId;
 
+  void Function()? channelOrderUpdateCallback;
+
+  @override
+  void initState() {
+    super.initState();
+
+    channelOrderUpdateCallback = (channelIds) {
+      load(_lastServerId!);
+    };
+
+    client.events.on(
+      SyEvents.dispatchChannelOrderUpdate,
+      channelOrderUpdateCallback!,
+    );
+  }
+
   void load(int serverId) async {
     setState(() {
       channels = [];
@@ -60,8 +76,8 @@ class _ChannelBarState extends State<ChannelBar> {
     return Column(
       children: [
         ContextMenu(
-          items:
-              () =>
+          asyncItems:
+              () async =>
                   server == null ? [] : makeServerContextMenu(context, server),
           child: Container(
             height: SyrenityTheme.topBarHeight,

@@ -5,10 +5,10 @@ import 'package:syrenity_client_flutter/main_callbacks.dart';
 import 'package:syrenity_client_flutter/stores/channel_store.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/theme.dart';
-import 'package:syrenity_client_flutter/widgets/message.dart';
-import 'package:syrenity_client_flutter/widgets/pages/main/main_right_events.dart';
+import 'package:syrenity_client_flutter/widgets/pages/main/channel_types/components/message.dart';
+import 'package:syrenity_client_flutter/widgets/pages/main/channel_types/controllers/text_channel_controller.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/member_bar.dart';
-import 'package:syrenity_client_flutter/widgets/pages/main/message_bar.dart';
+import 'package:syrenity_client_flutter/widgets/pages/main/channel_types/bars/message_bar.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/typing_indicator.dart';
 import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
@@ -63,7 +63,7 @@ class _MainRightState extends State<MainRight> {
       if (_scrollController.position.pixels >=
               _scrollController.position.maxScrollExtent - 50 &&
           !controller!.isLoadingMore) {
-        controller!.loadMore();
+        controller!.loadMessages(isInitial: false);
       }
 
       if (_scrollController.hasClients) {
@@ -261,6 +261,7 @@ class _MainRightState extends State<MainRight> {
                             isSystem: false,
                             sysType: null,
                             reactions: [],
+                            embeds: [],
                             webhookId: null,
                             webhook: null,
                             proxyId: null,

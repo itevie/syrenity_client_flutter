@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/stores/server_store.dart';
 import 'package:syrenity_client_flutter/widgets/table.dart';
+import 'package:syrenity_client_flutter/widgets/todo.dart';
 import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 class ServerRoleSettings extends StatefulWidget {
@@ -51,8 +52,10 @@ class _ServerRoleSettingsState extends State<ServerRoleSettings> {
                 ),
               ),
               ElevatedButton.icon(
-                onPressed: () {},
-                label: const Text("Add Role"),
+                onPressed: () {
+                  todo(context);
+                },
+                label: const Text("Add Role (TODO!)"),
                 icon: const Icon(Icons.add_rounded),
               ),
             ],
@@ -99,7 +102,9 @@ class _ServerRoleSettingsState extends State<ServerRoleSettings> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: IconButton.filled(
-                        onPressed: () {},
+                        onPressed: () {
+                          todo(context);
+                        },
                         icon: const Icon(Icons.edit_rounded, size: 18),
                       ),
                     ),

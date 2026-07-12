@@ -5,9 +5,9 @@ import 'package:syrenity_client_flutter/main_callbacks.dart';
 import 'package:syrenity_client_flutter/stores/channel_store.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/theme.dart';
-import 'package:syrenity_client_flutter/widgets/message.dart';
+import 'package:syrenity_client_flutter/widgets/pages/main/channel_types/components/message.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/member_bar.dart';
-import 'package:syrenity_client_flutter/widgets/pages/main/message_bar.dart';
+import 'package:syrenity_client_flutter/widgets/pages/main/channel_types/bars/message_bar.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/typing_indicator.dart';
 import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 

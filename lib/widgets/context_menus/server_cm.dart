@@ -10,18 +10,21 @@ import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/ser
 import 'package:syrenity_client_flutter/widgets/pages/settings/settings.dart';
 import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
-List<ContextMenuItem> makeServerContextMenu(
+Future<List<ContextMenuItem>> makeServerContextMenu(
   BuildContext context,
   SyServer server,
-) {
+) async {
   SyMember member;
 
   try {
     member = getMemberFromServer(context, server, client.user);
   } catch (e) {
-    return [
-      ContextMenuButton(label: e.toString(), onPressed: () {}, danger: true),
-    ];
+    final members = await server.members.fetchAll();
+    member = members.firstWhere((x) => x.userId == client.user.id);
+
+    // return [
+    //   ContextMenuButton(label: e.toString(), onPressed: () {}, danger: true),
+    // ];
   }
 
   // final canDelete = server.ownerId == client.user.id;
@@ -39,24 +42,6 @@ List<ContextMenuItem> makeServerContextMenu(
           await showInvitePromptBottomSheet(context, server, result.id);
         },
         icon: Icons.person_add,
-      ),
-    ContextMenuSeparator(),
-    if (!isOwner)
-      ContextMenuButton(
-        label: "Leave Server",
-        onPressed: () async {
-          final result = await showConfirmPrompt(
-            context,
-            const Text("Leave Server"),
-            Text("Are you sure you want to leave ${server.name}?"),
-          );
-
-          if (!result) return;
-
-          await server.leave();
-        },
-        danger: true,
-        icon: Icons.logout,
       ),
     ContextMenuSeparator(),
     ContextMenuButton(
@@ -78,6 +63,26 @@ List<ContextMenuItem> makeServerContextMenu(
         );
       },
     ),
+    ContextMenuSeparator(),
+
+    if (!isOwner)
+      ContextMenuButton(
+        label: "Leave Server",
+        onPressed: () async {
+          final result = await showConfirmPrompt(
+            context,
+            const Text("Leave Server"),
+            Text("Are you sure you want to leave ${server.name}?"),
+          );
+
+          if (!result) return;
+
+          await server.leave();
+        },
+        danger: true,
+        icon: Icons.logout,
+      ),
+
     ContextMenuSeparator(),
     if (SettingsStorage.instance.getSetting<bool>(SettingKeys.developerMode))
       makeCopyContextMenuButton(context, "Server ID", server.id.toString()),

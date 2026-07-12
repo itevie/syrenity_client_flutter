@@ -4,6 +4,8 @@ import 'package:syrenity_client_flutter/stores/channel_store.dart';
 import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/theme.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/channel_bar.dart';
+import 'package:syrenity_client_flutter/widgets/pages/main/channel_types/all_channels.dart';
+import 'package:syrenity_client_flutter/widgets/pages/main/channel_types/text_channel.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/main_right.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/self_section.dart';
 import 'package:syrenity_client_flutter/widgets/pages/main/server_bar.dart';
@@ -77,7 +79,7 @@ class DesktopChatShell extends StatelessWidget {
 
               if (currentPage == null)
                 Expanded(
-                  child: MainRight(
+                  child: AllChannels(
                     key: Key("main-${channel?.id}"),
                     channelId: channel?.id,
                   ),
