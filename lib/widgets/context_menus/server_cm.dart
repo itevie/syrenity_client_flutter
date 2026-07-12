@@ -5,9 +5,11 @@ import 'package:syrenity_client_flutter/shared_prefs.dart';
 import 'package:syrenity_client_flutter/stores/util.dart';
 import 'package:syrenity_client_flutter/widgets/context_menu.dart';
 import 'package:syrenity_client_flutter/widgets/copy_something.dart';
+import 'package:syrenity_client_flutter/widgets/modals/create_channel.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/main_setting_parts.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/page_settings/server_settings_parts.dart';
 import 'package:syrenity_client_flutter/widgets/pages/settings/settings.dart';
+import 'package:syrenity_client_flutter/widgets/show_dialog.dart';
 import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
 
 Future<List<ContextMenuItem>> makeServerContextMenu(
@@ -44,6 +46,13 @@ Future<List<ContextMenuItem>> makeServerContextMenu(
         icon: Icons.person_add,
       ),
     ContextMenuSeparator(),
+    ContextMenuButton(
+      label: "Add Channel",
+      onPressed: () {
+        showSyDialog(context, CreateChannelDialog());
+      },
+      icon: Icons.add,
+    ),
     ContextMenuButton(
       label: "Manage",
       icon: Icons.edit,

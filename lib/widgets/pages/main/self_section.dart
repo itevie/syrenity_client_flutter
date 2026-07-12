@@ -67,32 +67,6 @@ class _SelfSectionState extends State<SelfSection> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(width: 8),
-
-                    IconButton(
-                      onPressed: () async {
-                        final color = await showInputPrompt(
-                          context,
-                          Text("UI Colour:"),
-                          null,
-                        );
-                        SettingsStorage.instance.set<String?>(
-                          "theme_color",
-                          color,
-                        );
-                      },
-                      icon: const Icon(Icons.color_lens),
-                    ),
-
-                    IconButton(
-                      onPressed: () async {
-                        final old = SettingsStorage.instance.getSetting(
-                          SettingKeys.darkMode,
-                        );
-
-                        SettingsStorage.instance.set<bool>("dark_mode", !old);
-                      },
-                      icon: const Icon(Icons.sunny),
-                    ),
                   ],
                 ),
               ),

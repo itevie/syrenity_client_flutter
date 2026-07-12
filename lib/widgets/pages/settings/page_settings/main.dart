@@ -34,7 +34,7 @@ class SettingSections {
         context: context,
         icon: Icons.palette,
         name: "Appearance",
-        parts: [SettingParts.darkMode],
+        parts: [SettingParts.darkMode, SettingParts.themeColour],
       );
 
   static PartsSettingSection chat(BuildContext context) => PartsSettingSection(
@@ -89,7 +89,7 @@ class SettingSections {
 
           if (conf) {
             await SettingsStorage.instance.remove("token");
-            setupClient(login: false);
+            await client.ws.socket.close();
             reload();
           }
         },

@@ -28,10 +28,10 @@ enum SettingKeys {
   developerMode(storageKey: "developer_mode", defaultValue: false),
 
   darkMode(storageKey: "dark_mode", defaultValue: true),
-  themeColor(storageKey: "theme_color", defaultValue: false);
+  themeColor(storageKey: "theme_color", defaultValue: "#FF673AB7");
 
   final String storageKey;
-  final bool defaultValue;
+  final Object? defaultValue;
 
   const SettingKeys({required this.storageKey, required this.defaultValue});
 }
@@ -167,6 +167,31 @@ class SettingParts {
     callback: (value) {
       SettingsStorage.instance.set<bool>(
         SettingKeys.darkMode.storageKey,
+        value,
+      );
+    },
+  );
+
+  static final themeColour = StringSettingPart(
+    name: "Theme Colour",
+    description: "Select the theme colour for the application",
+    provideValue: () async {
+      var value =
+          SettingsStorage.instance.get<String?>(
+            SettingKeys.themeColor.storageKey,
+          ) ??
+          SettingKeys.themeColor.defaultValue;
+
+      if ((value as String).isEmpty || value.length < 6) {
+        value = SettingKeys.themeColor.defaultValue;
+      }
+
+      return value;
+    },
+    defaultValue: SettingKeys.themeColor.defaultValue,
+    callback: (value) {
+      SettingsStorage.instance.set<String?>(
+        SettingKeys.themeColor.storageKey,
         value,
       );
     },

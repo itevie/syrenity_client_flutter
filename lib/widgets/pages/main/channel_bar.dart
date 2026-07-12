@@ -23,6 +23,7 @@ class _ChannelBarState extends State<ChannelBar> {
   int? _lastServerId;
 
   void Function(SpecialDispatchChannelUpdateOrder)? channelOrderUpdateCallback;
+  void Function(SyChannel)? channelCreateCallback;
 
   @override
   void initState() {
@@ -37,6 +38,12 @@ class _ChannelBarState extends State<ChannelBar> {
       SyEvents.dispatchChannelOrderUpdate,
       channelOrderUpdateCallback!,
     );
+
+    channelCreateCallback = (channel) {
+      load(_lastServerId!);
+    };
+
+    client.events.on(SyEvents.dispatchChannelCreate, channelCreateCallback!);
   }
 
   @override
@@ -48,6 +55,11 @@ class _ChannelBarState extends State<ChannelBar> {
         channelOrderUpdateCallback!,
       );
       channelOrderUpdateCallback = null;
+    }
+
+    if (channelCreateCallback != null) {
+      client.events.off(SyEvents.dispatchChannelCreate, channelCreateCallback!);
+      channelCreateCallback = null;
     }
   }
 
@@ -106,32 +118,37 @@ class _ChannelBarState extends State<ChannelBar> {
         Expanded(
           child: Material(
             color: colors.secondaryContainer,
-            child: ListView.builder(
-              itemCount: channels.length,
-              itemBuilder: (context, i) {
-                final c = channels[i];
-                final selected = currentSettings.channelId == c.id;
+            child:
+                channels.isEmpty
+                    ? Center(child: CircularProgressIndicator())
+                    : ListView.builder(
+                      itemCount: channels.length,
+                      itemBuilder: (context, i) {
+                        final c = channels[i];
+                        final selected = currentSettings.channelId == c.id;
 
-                return ContextMenu(
-                  items: () => makeChannelContextMenu(context, c),
-                  child: ListTile(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                    title: channelName(c),
-                    tileColor:
-                        selected
-                            ? colors.primary.withValues(alpha: 0.24)
-                            : null,
-                    hoverColor: colors.primary.withValues(alpha: 0.08),
-                    onTap: () {
-                      if (MainCallbacks.setDrawerVisibility != null) {
-                        MainCallbacks.setDrawerVisibility!(false);
-                      }
-                      context.read<CurrentSettingsState>().setChannel(c.id);
-                    },
-                  ),
-                );
-              },
-            ),
+                        return ContextMenu(
+                          items: () => makeChannelContextMenu(context, c),
+                          child: ListTile(
+                            contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                            title: channelName(c),
+                            tileColor:
+                                selected
+                                    ? colors.primary.withValues(alpha: 0.24)
+                                    : null,
+                            hoverColor: colors.primary.withValues(alpha: 0.08),
+                            onTap: () {
+                              if (MainCallbacks.setDrawerVisibility != null) {
+                                MainCallbacks.setDrawerVisibility!(false);
+                              }
+                              context.read<CurrentSettingsState>().setChannel(
+                                c.id,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
           ),
         ),
       ],

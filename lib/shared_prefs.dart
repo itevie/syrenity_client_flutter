@@ -69,7 +69,6 @@ class SettingsStorage {
   }
 
   T getSetting<T>(SettingKeys key) {
-    if (_prefs == null) throw Exception("SettingsStorage not initialized");
     return _prefs!.get(key.storageKey) as T? ?? key.defaultValue as T;
   }
 }

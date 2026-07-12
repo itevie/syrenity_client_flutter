@@ -75,35 +75,48 @@ class _MemberBarState extends State<MemberBar> {
           Expanded(
             child: Material(
               color: colors.primaryContainer,
-              child: ListView.builder(
-                itemCount: members.length,
-                itemBuilder: (context, i) {
-                  final member = members[i];
-                  final user = users[member.userId];
+              child:
+                  members.isEmpty
+                      ? Center(child: CircularProgressIndicator())
+                      : ListView.builder(
+                        itemCount: members.length,
+                        itemBuilder: (context, i) {
+                          final member = members[i];
+                          final user = users[member.userId];
 
-                  if (user == null) {
-                    return SizedBox();
-                  }
+                          if (user == null) {
+                            return SizedBox();
+                          }
 
-                  return ContextMenu(
-                    items:
-                        () => makeServerUserAvatar(
-                          context,
-                          currentSettings.channelId!,
-                          user,
-                        ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                      leading: AvatarWithStatus(userId: user.id, size: 16),
-                      title: InlineUsername(user: user.id, bold: false),
-                      hoverColor: colors.primary.withValues(alpha: 0.08),
-                      onTap: () {
-                        showSyDialog(context, UserViewerModal(user: user));
-                      },
-                    ),
-                  );
-                },
-              ),
+                          return ContextMenu(
+                            items:
+                                () => makeServerUserAvatar(
+                                  context,
+                                  currentSettings.channelId!,
+                                  user,
+                                ),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
+                              leading: AvatarWithStatus(
+                                userId: user.id,
+                                size: 16,
+                              ),
+                              title: InlineUsername(user: user.id, bold: false),
+                              hoverColor: colors.primary.withValues(
+                                alpha: 0.08,
+                              ),
+                              onTap: () {
+                                showSyDialog(
+                                  context,
+                                  UserViewerModal(user: user),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
             ),
           ),
         ],

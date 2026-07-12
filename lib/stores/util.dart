@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syrenity_client_flutter/stores/channel_store.dart';
+import 'package:syrenity_client_flutter/stores/current_settings_store.dart';
 import 'package:syrenity_client_flutter/stores/member_store.dart';
 import 'package:syrenity_client_flutter/stores/server_store.dart';
 import 'package:syrenity_flutter_client_api/syrenity_flutter_client_api.dart';
@@ -43,4 +44,15 @@ SyMember getMemberFromServer(
   }
 
   return member;
+}
+
+SyServer? getCurrentServer(BuildContext context) {
+  final settings = context.read<CurrentSettingsState>();
+
+  if (settings.serverId == null) return null;
+
+  final servers = context.read<ServerStore>();
+  final server = servers[settings.serverId!];
+
+  return server;
 }

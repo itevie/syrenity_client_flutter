@@ -89,6 +89,7 @@ class _PreMainAppState extends State<PreMainApp> {
     await setupClient();
     SettingsStorage.instance.set("token", newToken);
 
+    print(newToken);
     await client.login(newToken, noWs: true);
 
     client.events.on(SyEvents.ready, (_) {
@@ -96,6 +97,8 @@ class _PreMainAppState extends State<PreMainApp> {
         token = newToken;
       });
     });
+
+    _checkToken();
   }
 
   @override

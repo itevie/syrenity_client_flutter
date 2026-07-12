@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-enum SettingType { checkbox, seperator, pageSwitch }
+enum SettingType { checkbox, string, seperator, pageSwitch }
 
 sealed class SettingPart<T> {
   final String name;
@@ -16,9 +16,9 @@ sealed class SettingPart<T> {
 
 class ChecklistSettingPart extends SettingPart<bool> {
   final void Function(bool value) callback;
-  final Future<bool> Function() provideValue;
+  final Future<Object?> Function() provideValue;
   final VoidCallback? reload;
-  final bool defaultValue;
+  final Object? defaultValue;
 
   ChecklistSettingPart({
     required super.name,
@@ -28,6 +28,22 @@ class ChecklistSettingPart extends SettingPart<bool> {
     required this.callback,
     this.reload,
   }) : super(type: SettingType.checkbox);
+}
+
+class StringSettingPart extends SettingPart<String> {
+  final void Function(String value) callback;
+  final Future<Object?> Function() provideValue;
+  final VoidCallback? reload;
+  final Object? defaultValue;
+
+  StringSettingPart({
+    required super.name,
+    required super.description,
+    required this.provideValue,
+    required this.defaultValue,
+    required this.callback,
+    this.reload,
+  }) : super(type: SettingType.string);
 }
 
 class SeperatorSettingPart extends SettingPart<int> {

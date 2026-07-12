@@ -18,6 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   String server = "Loading...";
   String? imageUrl;
+  bool loggingIn = false;
 
   bool obscurePassword = true;
 
@@ -38,12 +39,24 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void login() async {
-    final username = usernameController.text;
-    final password = passwordController.text;
+    setState(() {
+      loggingIn = true;
+    });
 
-    final response = await client.fetchSession(username, password);
+    try {
+      final username = usernameController.text;
+      final password = passwordController.text;
 
-    await widget.onLogin(response);
+      final response = await client.fetchSession(username, password);
+
+      await widget.onLogin(response);
+    } catch (e) {
+      showErrorPrompt(context, e.toString());
+
+      setState(() {
+        loggingIn = false;
+      });
+    }
   }
 
   void forgotPassword() async {
@@ -97,10 +110,6 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 if (imageUrl != null) Image.network(imageUrl!, width: 100),
 
-                // const Text(
-                //   "Login",
-                //   style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                // ),
                 const SizedBox(height: 32),
 
                 TextField(
@@ -143,9 +152,19 @@ class _LoginPageState extends State<LoginPage> {
                       child: const Text("Change Server"),
                     ),
                     Spacer(),
-                    TextButton(
-                      onPressed: forgotPassword,
-                      child: const Text("Forgot password?"),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: forgotPassword,
+                          child: const Text("Register"),
+                        ),
+                        TextButton(
+                          onPressed: forgotPassword,
+                          child: const Text("Forgot password?"),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -155,8 +174,15 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: login,
-                    child: const Text("Login"),
+                    onPressed: loggingIn ? null : login,
+                    child:
+                        loggingIn
+                            ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                            : const Text("Login"),
                   ),
                 ),
                 const SizedBox(height: 4),
